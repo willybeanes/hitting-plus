@@ -12,7 +12,7 @@ export interface Player {
   pa: number;
   "Hitting+": number | null;
   "Decision+": number | null;
-  "Swing+": number | null;
+  "Timing+": number | null;
   "Contact+": number | null;
   "Power+": number | null;
   "paBS+": number | null;
@@ -38,7 +38,7 @@ export interface SwingPlusData {
   players: Player[];
 }
 
-export const COMPONENT_KEYS = ["Decision+", "Swing+", "Contact+", "Power+"] as const;
+export const COMPONENT_KEYS = ["Decision+", "Timing+", "Contact+", "Power+"] as const;
 export type ComponentKey = (typeof COMPONENT_KEYS)[number];
 
 export const DEPTH_KEYS = ["depth_FB", "depth_BR", "depth_OS"] as const;

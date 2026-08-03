@@ -39,7 +39,7 @@ sequence:
 | Component | Grades | The question |
 | --- | --- | --- |
 | **Decision+** | swing or take | *whether* you swung |
-| **Swing+** | contact timing | *when* the bat arrived |
+| **Timing+** | contact timing | *when* the bat arrived |
 | **Contact+** | whiff avoidance | did the bat *find* it |
 | **Power+** | bat speed plus lift | *what* the swing brought |
 | **Hitting+** | refit on all four | the combination |
@@ -50,9 +50,9 @@ Details that matter for how you present them:
   choice, against what a league-average hitter gets in that location, count and
   pitch type. Correct choice scores zero, wrong choice scores negative by the size
   of the gap, so coin-flip pitches barely register.
-- **Swing+** measures how far out front a hitter makes contact on breaking and
-  offspeed pitches relative to fastballs. Everyone in baseball is early on soft
-  stuff. A hitter who is *less* early stayed back better. Higher Swing+ is better.
+- **Timing+** measures when the bat arrived: how far out front a hitter makes
+  contact on breaking and offspeed pitches relative to fastballs. Everyone is
+  early on soft stuff. Staying back is the skill. Higher Timing+ is better.
 - **Contact+** is whiff avoidance, scaled so higher is better.
 - **Power+** combines location-adjusted bat speed (paBS) and location-adjusted
   attack angle (paAA, the "lift" term). Both are adjusted because contact point
@@ -107,7 +107,7 @@ some player-seasons, so handle that everywhere rather than assuming presence.
 | `pa` | int | plate appearances | 150 to 750 |
 | `Hitting+` | float | the headline grade | 40 to 155 |
 | `Decision+` | float | | 45 to 145 |
-| `Swing+` | float | | 55 to 160 |
+| `Timing+` | float | | 55 to 160 |
 | `Contact+` | float | | 40 to 140 |
 | `Power+` | float | | 45 to 145 |
 | `paBS+` | float | bat speed half of Power+ | 45 to 150 |
@@ -128,8 +128,8 @@ Notes on the awkward ones:
 
 - **Percentiles are not in the file.** Compute them client side, **within season**,
   across the players present. Do not compute percentiles across pooled seasons.
-- **`fooled` is inverted relative to Swing+.** Lower `fooled` is better and produces
-  a higher Swing+. If you show the raw number, label it so that is obvious.
+- **`fooled` is inverted relative to Timing+.** Lower `fooled` is better and produces
+  a higher Timing+. If you show the raw number, label it so that is obvious.
 - **Depth fields are "inches in front of the batter, location adjusted."** Positive
   means contact happened further out front, which means the hitter was **early**.
   To make them readable, subtract the league mean for that field within the season
@@ -211,7 +211,7 @@ dashed vertical line.
 Why it works: everyone is early on soft stuff, so most hitters show fastball near
 the middle and breaking and offspeed pushed right. A hitter with good timing has
 them clustered; a hitter who gets fooled has them spread far right. It makes the
-Swing+ finding legible in one glance.
+Timing+ finding legible in one glance.
 
 Draw it as inline SVG. Do not pull in a charting library for this.
 

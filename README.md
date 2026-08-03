@@ -13,7 +13,7 @@ refitting them together.
 | Component | Grades | The question |
 | --- | --- | --- |
 | Decision+ | swing or take | whether you swung |
-| Swing+ | contact timing | when the bat arrived |
+| Timing+ | contact timing | when the bat arrived |
 | Contact+ | whiff avoidance | did the bat find it |
 | Power+ | bat speed plus lift | what the swing brought |
 | Hitting+ | refit on all four | the combination |
@@ -21,9 +21,9 @@ refitting them together.
 - **Decision+** scores every pitch by the run-value regret of the swing-or-take
   choice, against what a league-average hitter gets in that location, count and
   pitch type. A correct choice scores zero. Coin-flip pitches barely move the needle.
-- **Swing+** measures how far out front a hitter makes contact on breaking and
-  offspeed pitches relative to fastballs. Everyone in baseball is early on soft
-  stuff. A hitter who is less early stayed back better, so higher Swing+ is better.
+- **Timing+** measures when the bat arrived: how far out front a hitter makes
+  contact on breaking and offspeed pitches relative to fastballs. Everyone is
+  early on soft stuff; staying back is the skill, so higher Timing+ is better.
 - **Contact+** is whiff avoidance, scaled so higher is better.
 - **Power+** combines location-adjusted bat speed and location-adjusted attack angle
   (the lift term). Both are adjusted because contact point changes both

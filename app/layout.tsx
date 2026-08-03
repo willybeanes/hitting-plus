@@ -11,7 +11,7 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Hitting+ Explorer",
   description:
-    "Four graded inputs to a swing, in the order they happen: Decision+, Swing+, Contact+ and Power+, refit into Hitting+.",
+    "Four graded inputs to a swing, in the order they happen: Decision+, Timing+, Contact+ and Power+, refit into Hitting+.",
 };
 
 export default function RootLayout({

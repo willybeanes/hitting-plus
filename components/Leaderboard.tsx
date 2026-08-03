@@ -15,7 +15,7 @@ const COLUMNS: { key: keyof Row | "gap"; label: string }[] = [
   { key: "player_name", label: "Hitter" },
   { key: "Hitting+", label: "Hitting+" },
   { key: "Decision+", label: "Decision+" },
-  { key: "Swing+", label: "Swing+" },
+  { key: "Timing+", label: "Timing+" },
   { key: "Contact+", label: "Contact+" },
   { key: "Power+", label: "Power+" },
   { key: "xwoba", label: "xwOBA" },
@@ -104,7 +104,7 @@ export default function Leaderboard({
                     {fmtNum(r["Hitting+"], 0)}
                   </td>
                   <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r["Decision+"], 0)}</td>
-                  <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r["Swing+"], 0)}</td>
+                  <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r["Timing+"], 0)}</td>
                   <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r["Contact+"], 0)}</td>
                   <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r["Power+"], 0)}</td>
                   <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r.xwoba, 3)}</td>

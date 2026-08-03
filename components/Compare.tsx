@@ -13,7 +13,7 @@ const MAX_SLOTS = 3;
 const ROWS: { key: keyof Player; label: string; digits: number; signed?: boolean }[] = [
   { key: "Hitting+", label: "Hitting+", digits: 0 },
   { key: "Decision+", label: "Decision+", digits: 0 },
-  { key: "Swing+", label: "Swing+", digits: 0 },
+  { key: "Timing+", label: "Timing+", digits: 0 },
   { key: "Contact+", label: "Contact+", digits: 0 },
   { key: "Power+", label: "Power+", digits: 0 },
   { key: "xwoba", label: "xwOBA", digits: 3 },
