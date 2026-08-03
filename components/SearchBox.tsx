@@ -70,16 +70,16 @@ export default function SearchBox({ players, placeholder, onSelect, excludeNames
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 120)}
         onKeyDown={onKeyDown}
-        className="w-full rounded-[3px] border border-[var(--rule)] bg-[var(--panel)] px-3 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--dim)] focus-visible:outline-2 focus-visible:outline-[var(--green)]"
+        className="w-full rounded-lg border border-[var(--rule)] bg-white px-3 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--dim)] focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
       />
       {open && term.trim() && (
         <ul
           id={listId}
           role="listbox"
-          className="absolute left-0 right-0 top-[calc(100%+4px)] z-20 max-h-[300px] overflow-auto rounded-[3px] border border-[var(--rule)] bg-[var(--panel2)]"
+          className="absolute left-0 right-0 top-[calc(100%+4px)] z-20 max-h-[300px] overflow-auto rounded-[10px] border border-[var(--rule)] bg-white shadow-[var(--elevated-shadow)]"
         >
           {results.length === 0 && (
-            <li className="px-3 py-2 font-mono-num text-xs text-[var(--dim)]">No hitter by that name</li>
+            <li className="px-3 py-2 text-xs text-[var(--dim)]">No hitter by that name</li>
           )}
           {results.map((r, i) => (
             <li
@@ -90,11 +90,11 @@ export default function SearchBox({ players, placeholder, onSelect, excludeNames
               onClick={() => choose(r.player_name)}
               onMouseEnter={() => setActive(i)}
               className={`flex cursor-pointer items-center justify-between gap-3 px-3 py-2 text-sm ${
-                i === active ? "bg-[var(--green-dim)]" : ""
+                i === active ? "bg-[var(--accent-dim)]" : ""
               }`}
             >
               <span>{r.player_name}</span>
-              <span className="font-mono-num text-xs text-[var(--dim)]">{fmtNum(r["Hitting+"], 0)}</span>
+              <span className="text-xs text-[var(--dim)]">{fmtNum(r["Hitting+"], 0)}</span>
             </li>
           ))}
         </ul>

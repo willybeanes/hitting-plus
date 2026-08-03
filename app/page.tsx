@@ -23,10 +23,10 @@ export default async function Home() {
   if (!data) {
     return (
       <div className="mx-auto max-w-2xl px-5 py-16">
-        <div className="rounded border border-[var(--rule)] bg-[var(--panel)] p-8 text-center">
-          <p className="font-cond text-xl font-semibold">No data file found</p>
+        <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] p-8 text-center shadow-[var(--panel-shadow)]">
+          <p className="text-xl font-bold">No data file found</p>
           <p className="mt-3 text-sm text-[var(--dim)]">
-            Expected <code className="font-mono-num text-[var(--green)]">public/data/swingplus_latest.json</code>.
+            Expected <code className="text-[var(--accent)]">public/data/swingplus_latest.json</code>.
             See SETUP.md for how to add it.
           </p>
         </div>

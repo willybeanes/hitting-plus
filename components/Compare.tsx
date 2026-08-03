@@ -53,8 +53,8 @@ export default function Compare({
   }
 
   return (
-    <div className="rounded border border-[var(--rule)] bg-[var(--panel)] px-5 py-6 sm:px-7 sm:py-6">
-      <h2 className="mb-4 font-mono-num text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--dim)]">
+    <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] px-5 py-6 shadow-[var(--panel-shadow)] sm:px-7 sm:py-6">
+      <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--dim)]">
         Compare, two or three hitters
       </h2>
 
@@ -70,7 +70,7 @@ export default function Compare({
       )}
 
       {chosen.length === 0 && (
-        <p className="font-mono-num text-xs text-[var(--dim)]">
+        <p className="text-xs text-[var(--dim)]">
           Search above to add up to three hitters from the selected season.
         </p>
       )}
@@ -80,16 +80,16 @@ export default function Compare({
           <table className="w-full min-w-[420px] border-collapse text-sm">
             <thead>
               <tr>
-                <th className="px-3 pb-3 text-left font-mono-num text-[10px] font-medium uppercase tracking-[0.1em] text-[var(--dim)]">
+                <th className="px-3 pb-3 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--dim)]">
                   &nbsp;
                 </th>
                 {chosen.map((p) => (
                   <th key={p.player_name} className="px-3 pb-3 text-right align-bottom">
-                    <div className="font-cond text-lg font-bold leading-tight">{p.player_name}</div>
+                    <div className="text-lg font-bold leading-tight">{p.player_name}</div>
                     <button
                       type="button"
                       onClick={() => remove(p.player_name)}
-                      className="mt-1 font-mono-num text-[11px] text-[var(--dim)] underline decoration-[var(--dimmer)] hover:text-[var(--clay)]"
+                      className="mt-1 text-[11px] text-[var(--dim)] underline decoration-[var(--dimmer)] hover:text-[var(--accent)]"
                     >
                       remove
                     </button>
@@ -100,7 +100,7 @@ export default function Compare({
             <tbody>
               {ROWS.map((row) => (
                 <tr key={row.key} className="border-t border-[var(--rule)]">
-                  <td className="px-3 py-2.5 font-mono-num text-[11px] uppercase tracking-[0.08em] text-[var(--dim)]">
+                  <td className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--dim)]">
                     {row.label}
                     {COMPONENT_KEYS.includes(row.key as ComponentKey) && (
                       <div className="mt-0.5 normal-case tracking-normal text-[var(--dimmer)]">
@@ -114,12 +114,12 @@ export default function Compare({
                     return (
                       <td
                         key={p.player_name}
-                        className="px-3 py-2.5 text-right font-mono-num text-base font-semibold"
+                        className="px-3 py-2.5 text-right text-base font-bold tabular-nums"
                         style={{ color: p50 != null ? ramp(p50) : undefined }}
                       >
                         {row.signed ? fmtSigned(v, row.digits) : fmtNum(v, row.digits)}
                         {p50 != null && (
-                          <span className="ml-2 font-mono-num text-[11px] font-normal text-[var(--dimmer)]">
+                          <span className="ml-2 text-[11px] font-normal text-[var(--dimmer)]">
                             {p50.toFixed(0)}p
                           </span>
                         )}

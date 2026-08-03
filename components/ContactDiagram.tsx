@@ -2,9 +2,9 @@ import { DepthKey, Player } from "@/lib/types";
 import { fmtSigned } from "@/lib/metrics";
 
 const FAMILIES: { key: DepthKey; label: string; color: string }[] = [
-  { key: "depth_FB", label: "Fastball", color: "#E6EDF4" },
-  { key: "depth_BR", label: "Breaking", color: "#6FA8DC" },
-  { key: "depth_OS", label: "Offspeed", color: "#C9922F" },
+  { key: "depth_FB", label: "Fastball", color: "#1a1a1a" },
+  { key: "depth_BR", label: "Breaking", color: "#7fa0cb" },
+  { key: "depth_OS", label: "Offspeed", color: "#c9922f" },
 ];
 
 export default function ContactDiagram({
@@ -17,7 +17,7 @@ export default function ContactDiagram({
   const have = FAMILIES.filter((f) => player[f.key] != null);
 
   if (have.length === 0) {
-    return <p className="font-mono-num text-xs text-[var(--dim)]">No timing data for this season.</p>;
+    return <p className="text-xs text-[var(--dim)]">No timing data for this season.</p>;
   }
 
   const deviations = have.map((f) => (player[f.key] as number) - leagueDepth[f.key]);
@@ -36,13 +36,13 @@ export default function ContactDiagram({
     >
       <line x1={PAD} y1={H - 30} x2={W - PAD} y2={H - 30} stroke="var(--rule)" />
       <line x1={x(0)} y1={18} x2={x(0)} y2={H - 24} stroke="var(--dimmer)" strokeDasharray="2 3" />
-      <text x={x(0)} y={H - 10} fill="var(--dim)" fontFamily="var(--font-plex-mono)" fontSize="10" textAnchor="middle">
+      <text x={x(0)} y={H - 10} fill="var(--dim)" fontFamily="var(--font-dm-sans)" fontSize="10" textAnchor="middle">
         league average
       </text>
-      <text x={PAD} y={14} fill="var(--dimmer)" fontFamily="var(--font-plex-mono)" fontSize="10">
+      <text x={PAD} y={14} fill="var(--dimmer)" fontFamily="var(--font-dm-sans)" fontSize="10">
         later
       </text>
-      <text x={W - PAD} y={14} fill="var(--dimmer)" fontFamily="var(--font-plex-mono)" fontSize="10" textAnchor="end">
+      <text x={W - PAD} y={14} fill="var(--dimmer)" fontFamily="var(--font-dm-sans)" fontSize="10" textAnchor="end">
         earlier
       </text>
       {have.map((f, i) => {
@@ -57,7 +57,8 @@ export default function ContactDiagram({
               x={px}
               y={y - 9}
               fill={f.color}
-              fontFamily="var(--font-plex-mono)"
+              fontFamily="var(--font-dm-sans)"
+              fontWeight={600}
               fontSize="11"
               textAnchor="middle"
             >

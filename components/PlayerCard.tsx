@@ -45,11 +45,11 @@ export default function PlayerCard({ player: d, pct, leagueDepth }: Props) {
   }
 
   return (
-    <div className="rounded border border-[var(--rule)] bg-[var(--panel)] px-5 py-6 sm:px-7 sm:py-6">
+    <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] px-5 py-6 shadow-[var(--panel-shadow)] sm:px-7 sm:py-6">
       <div className="flex flex-wrap items-start justify-between gap-5 border-b border-[var(--rule)] pb-5">
         <div>
-          <div className="font-cond text-3xl font-bold leading-tight sm:text-[34px]">{d.player_name}</div>
-          <div className="mt-1.5 font-mono-num text-xs text-[var(--dim)]">
+          <div className="text-3xl font-bold leading-tight sm:text-[34px]">{d.player_name}</div>
+          <div className="mt-1.5 text-xs text-[var(--dim)]">
             {[
               `${d.game_year}`,
               `${d.pitches.toLocaleString()} pitches`,
@@ -59,16 +59,16 @@ export default function PlayerCard({ player: d, pct, leagueDepth }: Props) {
           </div>
         </div>
         <div className="flex-shrink-0 text-left sm:text-right">
-          <div className="font-mono-num text-[40px] font-semibold leading-none sm:text-[52px]" style={{ color: ramp(hp) }}>
+          <div className="text-[40px] font-bold leading-none tabular-nums sm:text-[52px]" style={{ color: ramp(hp) }}>
             {fmtNum(d["Hitting+"], 0)}
           </div>
-          <div className="mt-1 font-mono-num text-[11px] uppercase tracking-[0.14em] text-[var(--dim)]">Hitting+</div>
-          <div className="mt-0.5 font-mono-num text-xs text-[var(--dim)]">{hp == null ? "" : fmtPercentile(hp)}</div>
+          <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--dim)]">Hitting+</div>
+          <div className="mt-0.5 text-xs text-[var(--dim)]">{hp == null ? "" : fmtPercentile(hp)}</div>
         </div>
       </div>
 
       <div className="mt-6">
-        <h2 className="mb-4 font-mono-num text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--dim)]">
+        <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--dim)]">
           The swing, in order
         </h2>
         <div className="relative space-y-[18px] pl-[26px]">
@@ -82,26 +82,26 @@ export default function PlayerCard({ player: d, pct, leagueDepth }: Props) {
                 <span
                   className="absolute -left-[23px] top-[6px] h-[9px] w-[9px] rounded-full border"
                   style={{
-                    background: p != null && p >= 50 ? "var(--green)" : "var(--panel)",
-                    borderColor: p != null && p >= 50 ? "var(--green)" : "var(--dimmer)",
+                    background: p != null && p >= 50 ? "var(--accent)" : "var(--panel)",
+                    borderColor: p != null && p >= 50 ? "var(--accent)" : "var(--dimmer)",
                   }}
                 />
                 <div className="mb-1.5 flex flex-wrap items-baseline gap-2.5">
-                  <span className="font-mono-num text-[11px] tracking-[0.1em] text-[var(--dimmer)]">{i + 1}</span>
+                  <span className="text-[11px] tracking-[0.1em] text-[var(--dimmer)]">{i + 1}</span>
                   <span className="text-[15px] font-semibold">{k}</span>
                   <span className="text-[13px] text-[var(--dim)]">{COMPONENT_ASK[k]}</span>
-                  <span className="ml-auto font-mono-num text-[17px] font-semibold" style={{ color }}>
+                  <span className="ml-auto text-[17px] font-bold tabular-nums" style={{ color }}>
                     {fmtNum(d[k], 0)}
                   </span>
                 </div>
-                <div className="relative h-[7px] overflow-hidden rounded bg-[var(--well)]">
+                <div className="relative h-[7px] overflow-hidden rounded-full bg-[var(--track)]">
                   <span className="absolute -bottom-0.5 -top-0.5 left-1/2 w-px bg-[var(--dimmer)]" />
                   <span
-                    className="absolute bottom-0 left-0 top-0 rounded transition-[width] motion-reduce:transition-none"
+                    className="absolute bottom-0 left-0 top-0 rounded-full transition-[width] motion-reduce:transition-none"
                     style={{ width: `${w}%`, background: color }}
                   />
                 </div>
-                <div className="mt-1 font-mono-num text-[11px] text-[var(--dimmer)]">
+                <div className="mt-1 text-[11px] text-[var(--dimmer)]">
                   {p == null ? "--" : `${p.toFixed(0)}th percentile`} &middot; {COMPONENT_NOTE[k](d)}
                 </div>
               </div>
@@ -111,66 +111,66 @@ export default function PlayerCard({ player: d, pct, leagueDepth }: Props) {
       </div>
 
       <div className="mt-6">
-        <h2 className="mb-4 font-mono-num text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--dim)]">
+        <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--dim)]">
           Where he meets the ball
         </h2>
-        <div className="rounded-[3px] border border-[var(--rule)] bg-[var(--well)] px-4 pb-3 pt-[18px] sm:px-5">
+        <div className="rounded-[10px] border border-[var(--rule)] bg-[var(--track)] px-4 pb-3 pt-[18px] sm:px-5">
           <ContactDiagram player={d} leagueDepth={leagueDepth} />
-          <div className="mt-3 flex flex-wrap gap-4 font-mono-num text-[11px] text-[var(--dim)]">
+          <div className="mt-3 flex flex-wrap gap-4 text-[11px] text-[var(--dim)]">
             <span>
-              <i className="mr-1.5 inline-block h-[9px] w-[9px] rounded-sm align-middle" style={{ background: "#E6EDF4" }} />
-              <b className="font-medium">Fastball</b>
+              <i className="mr-1.5 inline-block h-[9px] w-[9px] rounded-sm align-middle" style={{ background: "#1a1a1a" }} />
+              <b className="font-semibold">Fastball</b>
             </span>
             <span>
-              <i className="mr-1.5 inline-block h-[9px] w-[9px] rounded-sm align-middle" style={{ background: "#6FA8DC" }} />
-              <b className="font-medium">Breaking</b>
+              <i className="mr-1.5 inline-block h-[9px] w-[9px] rounded-sm align-middle" style={{ background: "#7fa0cb" }} />
+              <b className="font-semibold">Breaking</b>
             </span>
             <span>
-              <i className="mr-1.5 inline-block h-[9px] w-[9px] rounded-sm align-middle" style={{ background: "#C9922F" }} />
-              <b className="font-medium">Offspeed</b>
+              <i className="mr-1.5 inline-block h-[9px] w-[9px] rounded-sm align-middle" style={{ background: "#c9922f" }} />
+              <b className="font-semibold">Offspeed</b>
             </span>
           </div>
         </div>
-        <p className="mt-2 font-mono-num text-[11px] text-[var(--dimmer)]">
+        <p className="mt-2 text-[11px] text-[var(--dimmer)]">
           Inches in front of the league average contact point for each pitch type. Everyone is early on soft stuff.
           Further right means more fooled.
         </p>
       </div>
 
       <div className="mt-6">
-        <h2 className="mb-4 font-mono-num text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--dim)]">
+        <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--dim)]">
           Grade against results
         </h2>
-        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[3px] border border-[var(--rule)] bg-[var(--rule)] sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[10px] border border-[var(--rule)] bg-[var(--rule)] sm:grid-cols-4">
           <div className="bg-[var(--panel)] px-4 py-3.5">
-            <div className="font-mono-num text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">Hitting+</div>
-            <div className="mt-1 font-mono-num text-xl font-semibold" style={{ color: ramp(hp) }}>
+            <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">Hitting+</div>
+            <div className="mt-1 text-xl font-bold tabular-nums" style={{ color: ramp(hp) }}>
               {hp == null ? "--" : hp.toFixed(0)}
             </div>
-            <div className="mt-0.5 font-mono-num text-[11px] text-[var(--dimmer)]">percentile</div>
+            <div className="mt-0.5 text-[11px] text-[var(--dimmer)]">percentile</div>
           </div>
           <div className="bg-[var(--panel)] px-4 py-3.5">
-            <div className="font-mono-num text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">xwOBA</div>
-            <div className="mt-1 font-mono-num text-xl font-semibold">{fmtNum(d.xwoba, 3)}</div>
-            <div className="mt-0.5 font-mono-num text-[11px] text-[var(--dimmer)]">
+            <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">xwOBA</div>
+            <div className="mt-1 text-xl font-bold tabular-nums">{fmtNum(d.xwoba, 3)}</div>
+            <div className="mt-0.5 text-[11px] text-[var(--dimmer)]">
               {xp == null ? "" : `${xp.toFixed(0)}th pctile`}
             </div>
           </div>
           <div className="bg-[var(--panel)] px-4 py-3.5">
-            <div className="font-mono-num text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">wOBA</div>
-            <div className="mt-1 font-mono-num text-xl font-semibold">{fmtNum(d.woba, 3)}</div>
-            <div className="mt-0.5 font-mono-num text-[11px] text-[var(--dimmer)]">actual</div>
+            <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">wOBA</div>
+            <div className="mt-1 text-xl font-bold tabular-nums">{fmtNum(d.woba, 3)}</div>
+            <div className="mt-0.5 text-[11px] text-[var(--dimmer)]">actual</div>
           </div>
           <div className="bg-[var(--panel)] px-4 py-3.5">
-            <div className="font-mono-num text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">Extra bases</div>
-            <div className="mt-1 font-mono-num text-xl font-semibold">{fmtSigned(d.extra_bases, 2)}</div>
-            <div className="mt-0.5 font-mono-num text-[11px] text-[var(--dimmer)]">per batted ball</div>
+            <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">Extra bases</div>
+            <div className="mt-1 text-xl font-bold tabular-nums">{fmtSigned(d.extra_bases, 2)}</div>
+            <div className="mt-0.5 text-[11px] text-[var(--dimmer)]">per batted ball</div>
           </div>
         </div>
         {read && (
           <div
-            className="mt-3.5 rounded-r-[3px] bg-[var(--panel2)] px-4 py-3.5 text-sm"
-            style={{ borderLeft: `2px solid ${warn ? "var(--amber)" : "var(--green)"}` }}
+            className="mt-3.5 rounded-r-[10px] bg-[var(--track)] px-4 py-3.5 text-sm"
+            style={{ borderLeft: `2px solid ${warn ? "var(--amber)" : "var(--accent)"}` }}
           >
             {read}
           </div>

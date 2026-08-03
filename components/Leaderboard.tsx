@@ -64,12 +64,12 @@ export default function Leaderboard({
   }
 
   return (
-    <div className="rounded border border-[var(--rule)] bg-[var(--panel)] px-5 py-6 sm:px-7 sm:py-6">
+    <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] px-5 py-6 shadow-[var(--panel-shadow)] sm:px-7 sm:py-6">
       <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-mono-num text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--dim)]">
+        <h2 className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--dim)]">
           Every qualified hitter
         </h2>
-        <span className="font-mono-num text-xs text-[var(--dimmer)]">{sorted.length} qualified</span>
+        <span className="text-xs text-[var(--dimmer)]">{sorted.length} qualified</span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] border-collapse text-sm">
@@ -81,9 +81,9 @@ export default function Leaderboard({
                   scope="col"
                   onClick={() => onSort(c.key as string)}
                   aria-sort={sort.k === c.key ? (sort.dir === 1 ? "ascending" : "descending") : "none"}
-                  className={`cursor-pointer select-none whitespace-nowrap px-2.5 pb-2.5 font-mono-num text-[10px] font-medium uppercase tracking-[0.1em] hover:text-[var(--text)] ${
+                  className={`cursor-pointer select-none whitespace-nowrap px-2.5 pb-2.5 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[var(--text)] ${
                     c.key === "player_name" ? "text-left" : "text-right"
-                  } ${sort.k === c.key ? "text-[var(--green)]" : "text-[var(--dim)]"}`}
+                  } ${sort.k === c.key ? "text-[var(--accent)]" : "text-[var(--dim)]"}`}
                 >
                   {c.label}
                 </th>
@@ -97,21 +97,22 @@ export default function Leaderboard({
                 <tr
                   key={r.player_name}
                   onClick={() => onSelect(r.player_name)}
-                  className="cursor-pointer border-t border-[var(--rule)] hover:bg-[var(--panel2)]"
+                  className="cursor-pointer border-t border-[var(--rule)] hover:bg-[var(--track)]"
                 >
-                  <td className="px-2.5 py-2 text-left hover:text-[var(--green)]">{r.player_name}</td>
-                  <td className="px-2.5 py-2 text-right font-mono-num" style={{ color: ramp(hp) }}>
+                  <td className="px-2.5 py-2 text-left font-medium hover:text-[var(--accent)]">{r.player_name}</td>
+                  <td className="px-2.5 py-2 text-right font-bold tabular-nums" style={{ color: ramp(hp) }}>
                     {fmtNum(r["Hitting+"], 0)}
                   </td>
-                  <td className="px-2.5 py-2 text-right font-mono-num">{fmtNum(r["Decision+"], 0)}</td>
-                  <td className="px-2.5 py-2 text-right font-mono-num">{fmtNum(r["Swing+"], 0)}</td>
-                  <td className="px-2.5 py-2 text-right font-mono-num">{fmtNum(r["Contact+"], 0)}</td>
-                  <td className="px-2.5 py-2 text-right font-mono-num">{fmtNum(r["Power+"], 0)}</td>
-                  <td className="px-2.5 py-2 text-right font-mono-num">{fmtNum(r.xwoba, 3)}</td>
+                  <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r["Decision+"], 0)}</td>
+                  <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r["Swing+"], 0)}</td>
+                  <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r["Contact+"], 0)}</td>
+                  <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r["Power+"], 0)}</td>
+                  <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r.xwoba, 3)}</td>
                   <td
-                    className="px-2.5 py-2 text-right font-mono-num"
+                    className="px-2.5 py-2 text-right font-semibold tabular-nums"
                     style={{
-                      color: r.gap == null ? "var(--dim)" : r.gap > 25 ? "var(--green)" : r.gap < -25 ? "var(--clay)" : "var(--dim)",
+                      color:
+                        r.gap == null ? "var(--dim)" : r.gap > 25 ? "var(--accent)" : r.gap < -25 ? "var(--cool)" : "var(--dim)",
                     }}
                   >
                     {r.gap == null ? "--" : fmtSigned(r.gap, 0)}
