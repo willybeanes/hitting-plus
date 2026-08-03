@@ -124,23 +124,38 @@ export default function HowItWorks() {
           <DiagramPanel activeId={activeId} level={level} />
         </div>
 
-        <div className="space-y-[36vh] pb-[30vh] pt-1">
-          {STEPS.map((s) => (
-            <div
-              key={s.id}
-              data-step-id={s.id}
-              ref={(el) => {
-                stepRefs.current[s.id] = el;
-              }}
-              className="scroll-mt-24"
-            >
-              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
-                {s.kicker}
-              </p>
-              <h3 className="mb-3 text-2xl font-bold sm:text-[28px]">{s.title}</h3>
-              <p className="max-w-[52ch] text-[15px] leading-relaxed text-[var(--dim)]">{s.body}</p>
-            </div>
-          ))}
+        <div className="relative space-y-[18vh] py-1 pb-[12vh] pl-6">
+          <div className="absolute bottom-0 left-[3px] top-2 w-px bg-[var(--rule)]" />
+          {STEPS.map((s) => {
+            const active = s.id === activeId;
+            const passed = REVEAL_AT[s.id] <= level;
+            return (
+              <div
+                key={s.id}
+                data-step-id={s.id}
+                ref={(el) => {
+                  stepRefs.current[s.id] = el;
+                }}
+                className="relative scroll-mt-24"
+              >
+                <span
+                  className="absolute -left-6 top-1.5 h-[7px] w-[7px] rounded-full border transition-colors duration-300"
+                  style={{
+                    background: passed ? "var(--accent)" : "var(--panel)",
+                    borderColor: passed ? "var(--accent)" : "var(--dimmer)",
+                  }}
+                />
+                <p
+                  className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] transition-colors duration-300"
+                  style={{ color: active ? "var(--accent)" : "var(--dimmer)" }}
+                >
+                  {s.kicker}
+                </p>
+                <h3 className="mb-3 text-2xl font-bold sm:text-[28px]">{s.title}</h3>
+                <p className="max-w-[52ch] text-[15px] leading-relaxed text-[var(--dim)]">{s.body}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
