@@ -1,5 +1,5 @@
 import { COMPONENT_KEYS, ComponentKey, CONF_FIELD, DepthKey, Player } from "@/lib/types";
-import { confidenceOpacity, confidenceTier, fmtNum, fmtPercentile, fmtSigned } from "@/lib/metrics";
+import { confidenceOpacity, confidenceTier, fmtNum, fmtPercentile, fmtSigned, ordinal } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
 import { COMPONENT_ASK, COMPONENT_NOTE, CONFIDENCE_NOTE } from "@/lib/copy";
 import ContactDiagram from "./ContactDiagram";
@@ -129,7 +129,7 @@ export default function PlayerCard({ player: d, pct, leagueDepth, eliteDepth }: 
                   />
                 </div>
                 <div className="mt-1 text-[11px] text-[var(--dimmer)]">
-                  {p == null ? "--" : `${p.toFixed(0)}th percentile`} &middot; {COMPONENT_NOTE[k](d)}
+                  {p == null ? "--" : `${ordinal(p)} percentile`} &middot; {COMPONENT_NOTE[k](d)}
                   {tier !== "full" && conf != null && <> &middot; {CONFIDENCE_NOTE}</>}
                 </div>
               </div>
@@ -186,7 +186,7 @@ export default function PlayerCard({ player: d, pct, leagueDepth, eliteDepth }: 
             <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">xwOBA</div>
             <div className="mt-1 text-xl font-bold tabular-nums">{fmtNum(d.xwoba, 3)}</div>
             <div className="mt-0.5 text-[11px] text-[var(--dimmer)]">
-              {xp == null ? "" : `${xp.toFixed(0)}th pctile`}
+              {xp == null ? "" : `${ordinal(xp)} pctile`}
             </div>
           </div>
           <div className="bg-[var(--panel)] px-4 py-3.5">

@@ -69,9 +69,26 @@ export function fmtPct(v: number | null | undefined): string {
   return (v * 100).toFixed(0) + "%";
 }
 
+/** "1st", "2nd", "3rd", "4th", ..., "11th", "12th", "13th", "21st", ... */
+export function ordinal(n: number): string {
+  const rounded = Math.round(n);
+  const mod100 = Math.abs(rounded) % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${rounded}th`;
+  switch (Math.abs(rounded) % 10) {
+    case 1:
+      return `${rounded}st`;
+    case 2:
+      return `${rounded}nd`;
+    case 3:
+      return `${rounded}rd`;
+    default:
+      return `${rounded}th`;
+  }
+}
+
 export function fmtPercentile(p: number | null | undefined): string {
   if (p == null) return "--";
-  return `${p.toFixed(0)}th percentile`;
+  return `${ordinal(p)} percentile`;
 }
 
 export type ConfidenceTier = "full" | "partial" | "low";
