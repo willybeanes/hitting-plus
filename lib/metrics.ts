@@ -62,3 +62,20 @@ export function fmtPercentile(p: number | null | undefined): string {
   if (p == null) return "--";
   return `${p.toFixed(0)}th percentile`;
 }
+
+export type ConfidenceTier = "full" | "partial" | "low";
+
+/** conf >= 0.7 is settled, 0.3 to 0.7 is short, below 0.3 is very short. */
+export function confidenceTier(conf: number | null | undefined): ConfidenceTier {
+  if (conf == null || conf >= 0.7) return "full";
+  if (conf >= 0.3) return "partial";
+  return "low";
+}
+
+/** Visual weight for a grade given how settled its sample is. Never hides the value. */
+export function confidenceOpacity(conf: number | null | undefined): number {
+  const tier = confidenceTier(conf);
+  if (tier === "full") return 1;
+  if (tier === "partial") return 0.62;
+  return 0.4;
+}

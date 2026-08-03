@@ -26,10 +26,12 @@ export default function Leaderboard({
   players,
   pct,
   onSelect,
+  minPA,
 }: {
   players: Player[];
   pct: Record<ComponentKey | "Hitting+" | "xwoba", PctFn>;
   onSelect: (name: string) => void;
+  minPA: number;
 }) {
   const [sort, setSort] = useState<{ k: string; dir: 1 | -1 }>({ k: "Hitting+", dir: -1 });
 
@@ -67,9 +69,9 @@ export default function Leaderboard({
     <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] px-5 py-6 shadow-[var(--panel-shadow)] sm:px-7 sm:py-6">
       <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--dim)]">
-          Every qualified hitter
+          Hitters with {minPA}+ PA
         </h2>
-        <span className="text-xs text-[var(--dimmer)]">{sorted.length} qualified</span>
+        <span className="text-xs text-[var(--dimmer)]">{sorted.length} shown</span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] border-collapse text-sm">

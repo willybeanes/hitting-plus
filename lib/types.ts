@@ -28,6 +28,13 @@ export interface Player {
   depth_FB: number | null;
   depth_BR: number | null;
   depth_OS: number | null;
+  qualified: boolean;
+  fam_min: number | null;
+  conf_hitting: number | null;
+  conf_decision: number | null;
+  conf_timing: number | null;
+  conf_contact: number | null;
+  conf_power: number | null;
 }
 
 export interface SwingPlusData {
@@ -43,3 +50,12 @@ export type ComponentKey = (typeof COMPONENT_KEYS)[number];
 
 export const DEPTH_KEYS = ["depth_FB", "depth_BR", "depth_OS"] as const;
 export type DepthKey = (typeof DEPTH_KEYS)[number];
+
+/** Maps each component (and the headline grade) to its confidence field. */
+export const CONF_FIELD: Record<ComponentKey | "Hitting+", keyof Player> = {
+  "Decision+": "conf_decision",
+  "Timing+": "conf_timing",
+  "Contact+": "conf_contact",
+  "Power+": "conf_power",
+  "Hitting+": "conf_hitting",
+};

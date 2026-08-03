@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { COMPONENT_KEYS, DepthKey, SwingPlusData } from "@/lib/types";
 import { buildPercentiles, leagueMean } from "@/lib/metrics";
-import { FOOTER_COPY } from "@/lib/copy";
+import { FOOTER_COPY, PA_FILTER_NOTE } from "@/lib/copy";
 import SearchBox from "./SearchBox";
 import PlayerCard from "./PlayerCard";
 import Leaderboard from "./Leaderboard";
@@ -13,16 +13,31 @@ type Tab = "card" | "leaderboard" | "compare";
 
 const DEPTH_KEYS: DepthKey[] = ["depth_FB", "depth_BR", "depth_OS"];
 const PCT_KEYS = [...COMPONENT_KEYS, "Hitting+", "xwoba"] as const;
+const PA_PRESETS = [10, 50, 150, 300, 500];
+const DEFAULT_MIN_PA = 150;
 
 export default function Explorer({ data }: { data: SwingPlusData }) {
   const seasons = useMemo(() => [...data.seasons].sort((a, b) => b - a), [data.seasons]);
   const [season, setSeason] = useState<number>(seasons[0]);
   const [tab, setTab] = useState<Tab>("card");
   const [compareNames, setCompareNames] = useState<string[]>([]);
+  const [minPA, setMinPA] = useState<number>(DEFAULT_MIN_PA);
 
   const seasonPlayers = useMemo(
     () => data.players.filter((p) => p.game_year === season),
     [data.players, season]
+  );
+
+  // The percentile baseline is always the qualified pool for the season, never the
+  // PA-filtered view. Moving the filter changes who is visible, not what 100 means.
+  const qualifiedSeasonPlayers = useMemo(
+    () => seasonPlayers.filter((p) => p.qualified),
+    [seasonPlayers]
+  );
+
+  const visiblePlayers = useMemo(
+    () => seasonPlayers.filter((p) => p.pa >= minPA),
+    [seasonPlayers, minPA]
   );
 
   const [pickedName, setPickedName] = useState<string | null>(() => {
@@ -37,13 +52,13 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
     [seasonPlayers, pickedName]
   );
 
-  const pct = useMemo(() => buildPercentiles(seasonPlayers, PCT_KEYS), [seasonPlayers]);
+  const pct = useMemo(() => buildPercentiles(qualifiedSeasonPlayers, PCT_KEYS), [qualifiedSeasonPlayers]);
 
   const leagueDepth = useMemo(() => {
     const out = {} as Record<DepthKey, number>;
-    for (const k of DEPTH_KEYS) out[k] = leagueMean(seasonPlayers, k);
+    for (const k of DEPTH_KEYS) out[k] = leagueMean(qualifiedSeasonPlayers, k);
     return out;
-  }, [seasonPlayers]);
+  }, [qualifiedSeasonPlayers]);
 
   function selectPlayer(name: string) {
     setPickedName(name);
@@ -74,42 +89,66 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
         </p>
       </header>
 
-      <div className="mb-5 flex flex-wrap items-center gap-2.5 rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] p-3 shadow-[var(--panel-shadow)]">
-        <nav className="flex gap-1" aria-label="View">
-          {TABS.map((t) => (
-            <button
-              key={t.key}
-              type="button"
-              onClick={() => setTab(t.key)}
-              aria-current={tab === t.key ? "page" : undefined}
-              className={`rounded-lg border px-3.5 py-2 text-sm font-semibold transition-colors ${
-                tab === t.key
-                  ? "border-[var(--accent)] bg-[var(--accent)] text-white"
-                  : "border-transparent bg-transparent text-[var(--dim)] hover:text-[var(--text)]"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </nav>
-
-        {tab === "card" && <SearchBox players={seasonPlayers} onSelect={selectPlayer} />}
-
-        <label className="ml-auto flex items-center gap-2 text-xs font-medium text-[var(--dim)]">
-          Season
-          <select
-            value={season}
-            onChange={(e) => setSeason(Number(e.target.value))}
-            className="rounded-lg border border-[var(--rule)] bg-white px-2.5 py-2 text-[13px] text-[var(--text)]"
-          >
-            {seasons.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
+      <div className="mb-5 rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] p-3 shadow-[var(--panel-shadow)]">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <nav className="flex gap-1" aria-label="View">
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setTab(t.key)}
+                aria-current={tab === t.key ? "page" : undefined}
+                className={`rounded-lg border px-3.5 py-2 text-sm font-semibold transition-colors ${
+                  tab === t.key
+                    ? "border-[var(--accent)] bg-[var(--accent)] text-white"
+                    : "border-transparent bg-transparent text-[var(--dim)] hover:text-[var(--text)]"
+                }`}
+              >
+                {t.label}
+              </button>
             ))}
-          </select>
-        </label>
-        <span className="text-xs text-[var(--dimmer)]">{seasonPlayers.length} qualified</span>
+          </nav>
+
+          {tab === "card" && <SearchBox players={visiblePlayers} onSelect={selectPlayer} />}
+
+          <label className="ml-auto flex items-center gap-2 text-xs font-medium text-[var(--dim)]">
+            Season
+            <select
+              value={season}
+              onChange={(e) => setSeason(Number(e.target.value))}
+              className="rounded-lg border border-[var(--rule)] bg-white px-2.5 py-2 text-[13px] text-[var(--text)]"
+            >
+              {seasons.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2.5 border-t border-[var(--rule)] pt-3">
+          <span className="text-xs font-medium text-[var(--dim)]">Min PA</span>
+          <div className="flex gap-1" role="group" aria-label="Minimum plate appearances">
+            {PA_PRESETS.map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setMinPA(n)}
+                aria-pressed={minPA === n}
+                className={`rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-colors ${
+                  minPA === n
+                    ? "border-[var(--accent)] bg-[var(--accent)] text-white"
+                    : "border-[var(--rule)] bg-white text-[var(--dim)] hover:text-[var(--text)]"
+                }`}
+              >
+                {n}+
+              </button>
+            ))}
+          </div>
+          <span className="text-xs text-[var(--dimmer)]">{visiblePlayers.length} shown</span>
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-[var(--dimmer)]">{PA_FILTER_NOTE}</p>
       </div>
 
       {tab === "card" &&
@@ -122,10 +161,18 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
           </div>
         ))}
 
-      {tab === "leaderboard" && <Leaderboard players={seasonPlayers} pct={pct} onSelect={selectPlayer} />}
+      {tab === "leaderboard" && (
+        <Leaderboard players={visiblePlayers} pct={pct} onSelect={selectPlayer} minPA={minPA} />
+      )}
 
       {tab === "compare" && (
-        <Compare players={seasonPlayers} pct={pct} selected={compareNames} onChangeSelected={setCompareNames} />
+        <Compare
+          players={seasonPlayers}
+          searchPool={visiblePlayers}
+          pct={pct}
+          selected={compareNames}
+          onChangeSelected={setCompareNames}
+        />
       )}
 
       <footer className="mt-9 space-y-3 border-t border-[var(--rule)] pt-5 text-xs leading-relaxed text-[var(--dimmer)]">

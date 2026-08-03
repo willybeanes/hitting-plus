@@ -23,11 +23,15 @@ const ROWS: { key: keyof Player; label: string; digits: number; signed?: boolean
 
 export default function Compare({
   players,
+  searchPool,
   pct,
   selected,
   onChangeSelected,
 }: {
+  /** Full season pool, used to resolve already-chosen hitters so the PA filter can't drop them mid-comparison. */
   players: Player[];
+  /** PA-filtered pool offered in the "add a hitter" search. */
+  searchPool: Player[];
   pct: Record<ComponentKey | "Hitting+" | "xwoba", PctFn>;
   selected: string[];
   onChangeSelected: (names: string[]) => void;
@@ -61,7 +65,7 @@ export default function Compare({
       {chosen.length < MAX_SLOTS && (
         <div className="mb-5 flex flex-wrap gap-3">
           <SearchBox
-            players={players}
+            players={searchPool}
             placeholder="Add a hitter to compare"
             onSelect={add}
             excludeNames={selected}

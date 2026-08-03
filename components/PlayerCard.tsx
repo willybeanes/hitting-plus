@@ -1,7 +1,7 @@
-import { COMPONENT_KEYS, ComponentKey, DepthKey, Player } from "@/lib/types";
-import { fmtNum, fmtPercentile, fmtSigned } from "@/lib/metrics";
+import { COMPONENT_KEYS, ComponentKey, CONF_FIELD, DepthKey, Player } from "@/lib/types";
+import { confidenceOpacity, confidenceTier, fmtNum, fmtPercentile, fmtSigned } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
-import { COMPONENT_ASK, COMPONENT_NOTE } from "@/lib/copy";
+import { COMPONENT_ASK, COMPONENT_NOTE, CONFIDENCE_NOTE } from "@/lib/copy";
 import ContactDiagram from "./ContactDiagram";
 
 type PctFn = (x: number | null | undefined) => number | null;
@@ -19,6 +19,9 @@ export default function PlayerCard({ player: d, pct, leagueDepth }: Props) {
   const hp = pct["Hitting+"](d["Hitting+"]);
   const xp = pct["xwoba"](d.xwoba);
   const gap = hp != null && xp != null ? hp - xp : null;
+
+  const hittingConf = d[CONF_FIELD["Hitting+"]] as number | null;
+  const hittingTier = confidenceTier(hittingConf);
 
   let read: string | null = null;
   let warn = false;
@@ -58,12 +61,20 @@ export default function PlayerCard({ player: d, pct, leagueDepth }: Props) {
             ].join(" · ")}
           </div>
         </div>
-        <div className="flex-shrink-0 text-left sm:text-right">
+        <div
+          className="flex-shrink-0 text-left sm:text-right"
+          style={{ opacity: confidenceOpacity(hittingConf) }}
+        >
           <div className="text-[40px] font-bold leading-none tabular-nums sm:text-[52px]" style={{ color: ramp(hp) }}>
             {fmtNum(d["Hitting+"], 0)}
           </div>
           <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--dim)]">Hitting+</div>
           <div className="mt-0.5 text-xs text-[var(--dim)]">{hp == null ? "" : fmtPercentile(hp)}</div>
+          {hittingTier !== "full" && hittingConf != null && (
+            <div className="mt-0.5 text-xs text-[var(--dimmer)]" title={CONFIDENCE_NOTE}>
+              {(hittingConf * 100).toFixed(0)}% confidence
+            </div>
+          )}
         </div>
       </div>
 
@@ -77,8 +88,10 @@ export default function PlayerCard({ player: d, pct, leagueDepth }: Props) {
             const p = pct[k](d[k]);
             const w = Math.max(2, Math.min(100, p == null ? 0 : p));
             const color = ramp(p);
+            const conf = d[CONF_FIELD[k]] as number | null;
+            const tier = confidenceTier(conf);
             return (
-              <div key={k} className="relative">
+              <div key={k} className="relative" style={{ opacity: confidenceOpacity(conf) }}>
                 <span
                   className="absolute -left-[23px] top-[6px] h-[9px] w-[9px] rounded-full border"
                   style={{
@@ -90,8 +103,19 @@ export default function PlayerCard({ player: d, pct, leagueDepth }: Props) {
                   <span className="text-[11px] tracking-[0.1em] text-[var(--dimmer)]">{i + 1}</span>
                   <span className="text-[15px] font-semibold">{k}</span>
                   <span className="text-[13px] text-[var(--dim)]">{COMPONENT_ASK[k]}</span>
-                  <span className="ml-auto text-[17px] font-bold tabular-nums" style={{ color }}>
-                    {fmtNum(d[k], 0)}
+                  <span className="ml-auto flex items-baseline gap-2">
+                    <span className="text-[17px] font-bold tabular-nums" style={{ color }}>
+                      {fmtNum(d[k], 0)}
+                    </span>
+                    {tier !== "full" && conf != null && (
+                      <span
+                        className="text-[11px] font-semibold tabular-nums"
+                        style={{ color: tier === "low" ? "var(--accent)" : "var(--amber)" }}
+                        title={CONFIDENCE_NOTE}
+                      >
+                        {(conf * 100).toFixed(0)}%
+                      </span>
+                    )}
                   </span>
                 </div>
                 <div className="relative h-[7px] overflow-hidden rounded-full bg-[var(--track)]">
@@ -103,6 +127,7 @@ export default function PlayerCard({ player: d, pct, leagueDepth }: Props) {
                 </div>
                 <div className="mt-1 text-[11px] text-[var(--dimmer)]">
                   {p == null ? "--" : `${p.toFixed(0)}th percentile`} &middot; {COMPONENT_NOTE[k](d)}
+                  {tier !== "full" && conf != null && <> &middot; {CONFIDENCE_NOTE}</>}
                 </div>
               </div>
             );
