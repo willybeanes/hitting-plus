@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { ComponentKey, Player } from "@/lib/types";
 import { fmtNum, fmtSigned } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
+import Headshot from "./Headshot";
 
 type PctFn = (x: number | null | undefined) => number | null;
 
@@ -11,14 +12,14 @@ interface Row extends Player {
   gap: number | null;
 }
 
-const COLUMNS: { key: keyof Row | "gap"; label: string }[] = [
+const COLUMNS: { key: keyof Row | "gap"; label: string; pctKey?: ComponentKey | "Hitting+" | "xwoba" }[] = [
   { key: "player_name", label: "Hitter" },
-  { key: "Hitting+", label: "Hitting+" },
-  { key: "Decision+", label: "Decision+" },
-  { key: "Timing+", label: "Timing+" },
-  { key: "Contact+", label: "Contact+" },
-  { key: "Power+", label: "Power+" },
-  { key: "xwoba", label: "xwOBA" },
+  { key: "Hitting+", label: "Hitting+", pctKey: "Hitting+" },
+  { key: "Decision+", label: "Decision+", pctKey: "Decision+" },
+  { key: "Timing+", label: "Timing+", pctKey: "Timing+" },
+  { key: "Contact+", label: "Contact+", pctKey: "Contact+" },
+  { key: "Power+", label: "Power+", pctKey: "Power+" },
+  { key: "xwoba", label: "xwOBA", pctKey: "xwoba" },
   { key: "gap", label: "Gap" },
 ];
 
@@ -73,8 +74,8 @@ export default function Leaderboard({
         </h2>
         <span className="text-xs text-[var(--dimmer)]">{sorted.length} shown</span>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] border-collapse text-sm">
+      <div className="max-h-[70vh] overflow-auto rounded-[10px] border border-[var(--rule)]">
+        <table className="w-full min-w-[680px] border-collapse text-sm">
           <thead>
             <tr>
               {COLUMNS.map((c) => (
@@ -83,7 +84,7 @@ export default function Leaderboard({
                   scope="col"
                   onClick={() => onSort(c.key as string)}
                   aria-sort={sort.k === c.key ? (sort.dir === 1 ? "ascending" : "descending") : "none"}
-                  className={`cursor-pointer select-none whitespace-nowrap px-2.5 pb-2.5 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[var(--text)] ${
+                  className={`sticky top-0 z-10 cursor-pointer select-none whitespace-nowrap border-b border-[var(--rule)] bg-[var(--panel)] px-2.5 py-2.5 text-[10px] font-bold uppercase tracking-[0.1em] shadow-[0_1px_0_var(--rule)] hover:text-[var(--text)] ${
                     c.key === "player_name" ? "text-left" : "text-right"
                   } ${sort.k === c.key ? "text-[var(--accent)]" : "text-[var(--dim)]"}`}
                 >
@@ -93,35 +94,47 @@ export default function Leaderboard({
             </tr>
           </thead>
           <tbody>
-            {sorted.map((r) => {
-              const hp = pct["Hitting+"](r["Hitting+"]);
-              return (
-                <tr
-                  key={r.player_name}
-                  onClick={() => onSelect(r.player_name)}
-                  className="cursor-pointer border-t border-[var(--rule)] hover:bg-[var(--track)]"
-                >
-                  <td className="px-2.5 py-2 text-left font-medium hover:text-[var(--accent)]">{r.player_name}</td>
-                  <td className="px-2.5 py-2 text-right font-bold tabular-nums" style={{ color: ramp(hp) }}>
-                    {fmtNum(r["Hitting+"], 0)}
-                  </td>
-                  <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r["Decision+"], 0)}</td>
-                  <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r["Timing+"], 0)}</td>
-                  <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r["Contact+"], 0)}</td>
-                  <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r["Power+"], 0)}</td>
-                  <td className="px-2.5 py-2 text-right tabular-nums">{fmtNum(r.xwoba, 3)}</td>
-                  <td
-                    className="px-2.5 py-2 text-right font-semibold tabular-nums"
-                    style={{
-                      color:
-                        r.gap == null ? "var(--dim)" : r.gap > 25 ? "var(--accent)" : r.gap < -25 ? "var(--cool)" : "var(--dim)",
-                    }}
-                  >
-                    {r.gap == null ? "--" : fmtSigned(r.gap, 0)}
-                  </td>
-                </tr>
-              );
-            })}
+            {sorted.map((r) => (
+              <tr
+                key={r.player_name}
+                onClick={() => onSelect(r.player_name)}
+                className="cursor-pointer border-t border-[var(--rule)] hover:bg-[var(--track)]"
+              >
+                <td className="px-2.5 py-2 text-left font-medium hover:text-[var(--accent)]">
+                  <span className="flex items-center gap-2">
+                    <Headshot name={r.player_name} size={22} />
+                    {r.player_name}
+                  </span>
+                </td>
+                {COLUMNS.slice(1).map((c) => {
+                  const value = c.key === "gap" ? r.gap : (r[c.key as keyof Row] as number | null);
+                  const p50 = c.pctKey ? pct[c.pctKey](value) : c.key === "gap" ? null : null;
+                  const color =
+                    c.key === "gap"
+                      ? r.gap == null
+                        ? "var(--dim)"
+                        : r.gap > 25
+                        ? "var(--accent)"
+                        : r.gap < -25
+                        ? "var(--cool)"
+                        : "var(--dim)"
+                      : p50 != null
+                      ? ramp(p50)
+                      : "var(--text)";
+                  const digits = c.key === "xwoba" ? 3 : 0;
+                  const text = c.key === "gap" ? (r.gap == null ? "--" : fmtSigned(r.gap, 0)) : fmtNum(value, digits);
+                  return (
+                    <td
+                      key={c.key}
+                      className={`px-2.5 py-2 text-right tabular-nums ${c.key === "Hitting+" || c.key === "gap" ? "font-bold" : ""}`}
+                      style={{ color }}
+                    >
+                      {text}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

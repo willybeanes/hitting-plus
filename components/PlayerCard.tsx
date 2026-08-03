@@ -3,6 +3,7 @@ import { confidenceOpacity, confidenceTier, fmtNum, fmtPercentile, fmtSigned } f
 import { ramp } from "@/lib/ramp";
 import { COMPONENT_ASK, COMPONENT_NOTE, CONFIDENCE_NOTE } from "@/lib/copy";
 import ContactDiagram from "./ContactDiagram";
+import Headshot from "./Headshot";
 
 type PctFn = (x: number | null | undefined) => number | null;
 
@@ -10,12 +11,13 @@ interface Props {
   player: Player;
   pct: Record<ComponentKey | "Hitting+" | "xwoba", PctFn>;
   leagueDepth: Record<DepthKey, number>;
+  eliteDepth: Record<DepthKey, number>;
 }
 
 const GAP_HIGH = 25;
 const GAP_LOW = -25;
 
-export default function PlayerCard({ player: d, pct, leagueDepth }: Props) {
+export default function PlayerCard({ player: d, pct, leagueDepth, eliteDepth }: Props) {
   const hp = pct["Hitting+"](d["Hitting+"]);
   const xp = pct["xwoba"](d.xwoba);
   const gap = hp != null && xp != null ? hp - xp : null;
@@ -42,23 +44,24 @@ export default function PlayerCard({ player: d, pct, leagueDepth }: Props) {
         read =
           "He is producing well beyond what the swing itself explains. His extra bases are unremarkable, so this gap is not baserunning. It is the model missing something about how he hits.";
       }
-    } else {
-      read = "Grade and results line up. What the swing looks like is what it produced.";
     }
   }
 
   return (
     <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] px-5 py-6 shadow-[var(--panel-shadow)] sm:px-7 sm:py-6">
       <div className="flex flex-wrap items-start justify-between gap-5 border-b border-[var(--rule)] pb-5">
-        <div>
-          <div className="text-3xl font-bold leading-tight sm:text-[34px]">{d.player_name}</div>
-          <div className="mt-1.5 text-xs text-[var(--dim)]">
-            {[
-              `${d.game_year}`,
-              `${d.pitches.toLocaleString()} pitches`,
-              `${d.swings.toLocaleString()} swings`,
-              `${d.pa} PA`,
-            ].join(" · ")}
+        <div className="flex items-center gap-4">
+          <Headshot name={d.player_name} size={72} className="border border-[var(--panel-border)]" />
+          <div>
+            <div className="text-3xl font-bold leading-tight sm:text-[34px]">{d.player_name}</div>
+            <div className="mt-1.5 text-xs text-[var(--dim)]">
+              {[
+                `${d.game_year}`,
+                `${d.pitches.toLocaleString()} pitches`,
+                `${d.swings.toLocaleString()} swings`,
+                `${d.pa} PA`,
+              ].join(" · ")}
+            </div>
           </div>
         </div>
         <div
@@ -140,7 +143,7 @@ export default function PlayerCard({ player: d, pct, leagueDepth }: Props) {
           Where he meets the ball
         </h2>
         <div className="rounded-[10px] border border-[var(--rule)] bg-[var(--track)] px-4 pb-3 pt-[18px] sm:px-5">
-          <ContactDiagram player={d} leagueDepth={leagueDepth} />
+          <ContactDiagram player={d} leagueDepth={leagueDepth} eliteDepth={eliteDepth} />
           <div className="mt-3 flex flex-wrap gap-4 text-[11px] text-[var(--dim)]">
             <span>
               <i className="mr-1.5 inline-block h-[9px] w-[9px] rounded-sm align-middle" style={{ background: "#1a1a1a" }} />
@@ -154,11 +157,16 @@ export default function PlayerCard({ player: d, pct, leagueDepth }: Props) {
               <i className="mr-1.5 inline-block h-[9px] w-[9px] rounded-sm align-middle" style={{ background: "#c9922f" }} />
               <b className="font-semibold">Offspeed</b>
             </span>
+            <span>
+              <i className="mr-1.5 inline-block h-0 w-0 align-middle" style={{ borderLeft: "4px solid transparent", borderRight: "4px solid transparent", borderBottom: "6px solid var(--accent)" }} />
+              <b className="font-semibold">Elite (90th pctile)</b>
+            </span>
           </div>
         </div>
         <p className="mt-2 text-[11px] text-[var(--dimmer)]">
           Inches in front of the league average contact point for each pitch type. Everyone is early on soft stuff.
-          Further right means more fooled.
+          Further right means more fooled. The triangle marks where the league&apos;s best hitters sit on each pitch
+          type, so you can see the gap to elite, not just to average.
         </p>
       </div>
 

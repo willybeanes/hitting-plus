@@ -1,0 +1,228 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { COMPONENT_DESC } from "@/lib/copy";
+
+interface Step {
+  id: string;
+  kicker: string;
+  title: string;
+  body: string;
+}
+
+const STEPS: Step[] = [
+  {
+    id: "intro",
+    kicker: "How Hitting+ works",
+    title: "A swing happens in order",
+    body: "Decision+, Timing+, Contact+ and Power+ each grade one part of the same swing, in the sequence it actually happens: whether to swing, when the bat arrived, whether it found the ball, and what it brought when it did. Scroll to walk through each one.",
+  },
+  {
+    id: "decision",
+    kicker: "Step 1 of 4 · whether to swing",
+    title: "Decision+",
+    body: COMPONENT_DESC["Decision+"],
+  },
+  {
+    id: "timing",
+    kicker: "Step 2 of 4 · when the bat arrived",
+    title: "Timing+",
+    body: COMPONENT_DESC["Timing+"],
+  },
+  {
+    id: "contact",
+    kicker: "Step 3 of 4 · did the bat find it",
+    title: "Contact+",
+    body: COMPONENT_DESC["Contact+"],
+  },
+  {
+    id: "power",
+    kicker: "Step 4 of 4 · what the swing brought",
+    title: "Power+",
+    body: COMPONENT_DESC["Power+"],
+  },
+  {
+    id: "hitting",
+    kicker: "The headline",
+    title: "Hitting+ is a refit, not an average",
+    body: "Once all four are graded, Hitting+ is built by refitting a regression on all four component features together, not by averaging their scores. The components correlate with each other, so a simple average would count the same underlying tendency more than once. The refit weighs each one by how much it actually explains.",
+  },
+  {
+    id: "scale",
+    kicker: "Reading the numbers",
+    title: "100 is average, 15 is one standard deviation",
+    body: "Every grade here, including Hitting+ itself, is scaled the same way: 100 is league average and 15 points is one standard deviation. That is the same convention as wRC+ and Stuff+, so a 130 is exactly as far above average here as a 130 wRC+ is anywhere else.",
+  },
+  {
+    id: "limits",
+    kicker: "Two honest limitations",
+    title: "What Hitting+ can't see",
+    body: "It grades the swing, not the result, so it cannot see baserunning: a hitter who stretches singles into doubles beats his grade by design. And because bat speed carries the most weight in the fit, a hitter well below expected bat speed can grade in the bottom few percent even when his outcomes are league average. Both are real limits of the model, not bugs.",
+  },
+];
+
+const REVEAL_AT: Record<string, number> = {
+  intro: 0,
+  decision: 1,
+  timing: 2,
+  contact: 3,
+  power: 4,
+  hitting: 5,
+  scale: 5,
+  limits: 5,
+};
+
+const BARS = [
+  { key: "decision", label: "Decision+", revealAt: 1, pct: 58 },
+  { key: "timing", label: "Timing+", revealAt: 2, pct: 70 },
+  { key: "contact", label: "Contact+", revealAt: 3, pct: 50 },
+  { key: "power", label: "Power+", revealAt: 4, pct: 82 },
+];
+
+const HITTING_PCT = 74;
+
+export default function HowItWorks() {
+  const [activeId, setActiveId] = useState<string>(STEPS[0].id);
+  const stepRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Picks whichever step's center is closest to the viewport center, so overlapping
+  // tall steps never leave two candidates racing an IntersectionObserver callback.
+  useEffect(() => {
+    function update() {
+      const viewportCenter = window.innerHeight / 2;
+      let closestId: string | null = null;
+      let closestDist = Infinity;
+      for (const step of STEPS) {
+        const el = stepRefs.current[step.id];
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        const center = rect.top + rect.height / 2;
+        const dist = Math.abs(center - viewportCenter);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestId = step.id;
+        }
+      }
+      if (closestId) setActiveId(closestId);
+    }
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  const level = REVEAL_AT[activeId] ?? 0;
+
+  return (
+    <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] p-4 shadow-[var(--panel-shadow)] sm:p-6">
+      <div className="lg:grid lg:grid-cols-[360px_1fr] lg:items-start lg:gap-8">
+        <div className="mb-6 lg:sticky lg:top-6 lg:mb-0">
+          <DiagramPanel activeId={activeId} level={level} />
+        </div>
+
+        <div className="space-y-[36vh] pb-[30vh] pt-1">
+          {STEPS.map((s) => (
+            <div
+              key={s.id}
+              data-step-id={s.id}
+              ref={(el) => {
+                stepRefs.current[s.id] = el;
+              }}
+              className="scroll-mt-24"
+            >
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
+                {s.kicker}
+              </p>
+              <h3 className="mb-3 text-2xl font-bold sm:text-[28px]">{s.title}</h3>
+              <p className="max-w-[52ch] text-[15px] leading-relaxed text-[var(--dim)]">{s.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DiagramPanel({ activeId, level }: { activeId: string; level: number }) {
+  return (
+    <div className="rounded-[14px] border border-[var(--rule)] bg-[var(--track)] p-5">
+      <div className="space-y-4">
+        {BARS.map((b, i) => {
+          const revealed = level >= b.revealAt;
+          return (
+            <div key={b.key} className="transition-opacity duration-500 motion-reduce:transition-none" style={{ opacity: revealed ? 1 : 0.35 }}>
+              <div className="mb-1.5 flex items-baseline gap-2">
+                <span
+                  className="inline-block h-[8px] w-[8px] rounded-full border"
+                  style={{
+                    background: revealed ? "var(--accent)" : "transparent",
+                    borderColor: revealed ? "var(--accent)" : "var(--dimmer)",
+                  }}
+                />
+                <span className="text-[13px] font-semibold">{b.label}</span>
+                <span className="ml-auto text-[11px] tabular-nums text-[var(--dimmer)]">{i + 1}</span>
+              </div>
+              <div className="relative h-[8px] overflow-hidden rounded-full bg-white">
+                <span
+                  className="absolute bottom-0 left-0 top-0 rounded-full bg-[var(--accent)] transition-[width] duration-700 motion-reduce:transition-none"
+                  style={{ width: revealed ? `${b.pct}%` : "0%" }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="my-4 border-t border-dashed border-[var(--rule)]" />
+
+      <div className="transition-opacity duration-500 motion-reduce:transition-none" style={{ opacity: level >= 5 ? 1 : 0.35 }}>
+        <div className="mb-1.5 flex items-baseline gap-2">
+          <span className="text-[13px] font-bold">Hitting+</span>
+          <span className="ml-auto text-[11px] text-[var(--dimmer)]">refit, not averaged</span>
+        </div>
+        <div className="relative h-[12px] overflow-hidden rounded-full bg-white">
+          <span
+            className="absolute bottom-0 left-0 top-0 rounded-full bg-[var(--text)] transition-[width] duration-700 motion-reduce:transition-none"
+            style={{ width: level >= 5 ? `${HITTING_PCT}%` : "0%" }}
+          />
+        </div>
+      </div>
+
+      {activeId === "scale" && (
+        <div className="mt-5 border-t border-[var(--rule)] pt-4">
+          <div className="relative h-[36px]">
+            <div className="absolute left-0 right-0 top-[16px] h-px bg-[var(--rule)]" />
+            {[70, 85, 100, 115, 130].map((v) => (
+              <div key={v} className="absolute top-0 flex -translate-x-1/2 flex-col items-center" style={{ left: `${((v - 70) / 60) * 100}%` }}>
+                <span className={`text-[11px] font-semibold tabular-nums ${v === 100 ? "text-[var(--accent)]" : "text-[var(--dimmer)]"}`}>
+                  {v}
+                </span>
+                <span className="mt-1 h-2 w-px bg-[var(--dimmer)]" />
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-[11px] text-[var(--dimmer)]">
+            League average sits at 100. Each 15 points is one standard deviation.
+          </p>
+        </div>
+      )}
+
+      {activeId === "limits" && (
+        <div className="mt-5 space-y-3 border-t border-[var(--rule)] pt-4">
+          <div className="rounded-lg border border-[var(--rule)] bg-white px-3 py-2.5 text-[11px] text-[var(--dim)]">
+            <span className="font-semibold text-[var(--text)]">Baserunning: </span>
+            not graded. Legs beat the grade by design.
+          </div>
+          <div className="rounded-lg border border-[var(--rule)] bg-white px-3 py-2.5 text-[11px] text-[var(--dim)]">
+            <span className="font-semibold text-[var(--text)]">Weak bat speed: </span>
+            over-punished even with average results.
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

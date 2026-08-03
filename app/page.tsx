@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { Suspense } from "react";
 import Explorer from "@/components/Explorer";
 import { SwingPlusData } from "@/lib/types";
 
@@ -34,5 +35,9 @@ export default async function Home() {
     );
   }
 
-  return <Explorer data={data} />;
+  return (
+    <Suspense fallback={null}>
+      <Explorer data={data} />
+    </Suspense>
+  );
 }

@@ -36,6 +36,5 @@ export const CONFIDENCE_NOTE =
   "Sample is short, so this grade is pulled toward league average.";
 
 export const FOOTER_COPY = [
-  "Hitting+ grades from Statcast pitch tracking, 2024 to 2026, calibrated against xwOBA. Decision+, Timing+, Contact+ and Power+ each grade one part of the swing, in the order it happens. Hitting+ is a regression refit on all four, not an average of them, since the components correlate and averaging would count the same tendency more than once. All five are scaled so 100 is league average and 15 is one standard deviation, the same convention as wRC+ and Stuff+.",
-  "Two honest limitations. First, Hitting+ cannot see baserunning: it grades the swing, so hitters who stretch singles into doubles beat their grade by design. Extra bases per batted ball is shown separately so you can tell that apart from a gap the model actually missed. Second, it over-punishes elite contact hitters with no power: bat speed carries the most weight in the fit, so a hitter well below expected bat speed can grade in the bottom few percent even when his expected outcomes are league average. That is a real limitation of the model, not a bug to design around.",
+  "Hitting+ grades from Statcast pitch tracking, 2024 to 2026, calibrated against xwOBA. Decision+, Timing+, Contact+ and Power+ each grade one part of the swing, in the order it happens. Hitting+ is a regression refit on all four, not an average of them, since the components correlate and averaging would count the same tendency more than once.",
 ];

@@ -43,6 +43,17 @@ export function leagueMean(players: Player[], key: keyof Player): number {
   return values.reduce((a, b) => a + b, 0) / values.length;
 }
 
+/** Value at percentile p (0 to 100) of a sorted-ascending numeric field, ignoring nulls. */
+export function fieldPercentileValue(players: Player[], key: keyof Player, p: number): number | null {
+  const values = players
+    .map((pl) => pl[key])
+    .filter((v): v is number => typeof v === "number")
+    .sort((a, b) => a - b);
+  if (values.length === 0) return null;
+  const idx = Math.min(values.length - 1, Math.max(0, Math.round((p / 100) * (values.length - 1))));
+  return values[idx];
+}
+
 export function fmtNum(v: number | null | undefined, digits: number): string {
   if (v == null) return "--";
   return v.toFixed(digits);

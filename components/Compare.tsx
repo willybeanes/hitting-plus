@@ -5,6 +5,7 @@ import { fmtNum, fmtSigned } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
 import { COMPONENT_ASK } from "@/lib/copy";
 import SearchBox from "./SearchBox";
+import Headshot from "./Headshot";
 
 type PctFn = (x: number | null | undefined) => number | null;
 
@@ -89,6 +90,7 @@ export default function Compare({
                 </th>
                 {chosen.map((p) => (
                   <th key={p.player_name} className="px-3 pb-3 text-right align-bottom">
+                    <Headshot name={p.player_name} size={48} className="ml-auto mb-1.5 border border-[var(--panel-border)]" />
                     <div className="text-lg font-bold leading-tight">{p.player_name}</div>
                     <button
                       type="button"
