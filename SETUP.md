@@ -76,21 +76,14 @@ player card loaded. Leave this Terminal window open while you work; press
 
 ## 3. Deploying to Vercel
 
-This only needs to be done once, the first time you put the app online.
+Already done. This repo lives at
+[github.com/willybeanes/hitting-plus](https://github.com/willybeanes/hitting-plus)
+(private) and is connected to Vercel project `willybeanes-projects/hitting-plus`.
+The live site is at **https://hitting-plus.vercel.app**.
 
-1. Create a free account at [vercel.com](https://vercel.com) if you do not have
-   one, and sign in.
-2. Push this project to a GitHub repository (create a new, empty repository on
-   [github.com/new](https://github.com/new) first, then run the three commands
-   GitHub shows you under "push an existing repository from the command line").
-3. In the Vercel dashboard, click **Add New... > Project**, choose **Import Git
-   Repository**, and select the repository you just pushed.
-4. Leave every setting on its default (Vercel detects Next.js automatically) and
-   click **Deploy**.
-
-After a minute or two you get a live URL like `hitting-plus.vercel.app`. From then
-on, every time you push a change to the `main` branch on GitHub, Vercel rebuilds
-and redeploys automatically. You do not need to repeat these four steps.
+That connection means every push to the `main` branch on GitHub is picked up by
+Vercel automatically, rebuilt, and redeployed within a minute or two. You do not
+need to touch the Vercel dashboard for routine updates, only for step 4 below.
 
 ---
 
