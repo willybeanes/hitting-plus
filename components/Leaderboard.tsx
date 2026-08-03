@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ComponentKey, Player } from "@/lib/types";
 import { fmtNum, fmtSigned } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
+import { MlbInfo, resolveMlbInfo } from "@/lib/headshot";
 import Headshot from "./Headshot";
 
 type PctFn = (x: number | null | undefined) => number | null;
@@ -23,6 +24,35 @@ const COLUMNS: { key: keyof Row | "gap"; label: string; pctKey?: ComponentKey | 
   { key: "gap", label: "Gap" },
 ];
 
+/** Resolves team/position for a batch of names with limited concurrency, caching across calls. */
+function usePlayerInfo(names: string[]) {
+  const [info, setInfo] = useState<Record<string, MlbInfo | null>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    const CONCURRENCY = 12;
+    const toFetch = names.filter((n) => !(n in info));
+    if (toFetch.length === 0) return;
+
+    let idx = 0;
+    async function worker() {
+      while (idx < toFetch.length) {
+        const name = toFetch[idx++];
+        const result = await resolveMlbInfo(name);
+        if (cancelled) return;
+        setInfo((prev) => (name in prev ? prev : { ...prev, [name]: result }));
+      }
+    }
+    for (let i = 0; i < Math.min(CONCURRENCY, toFetch.length); i++) worker();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [names, info]);
+
+  return info;
+}
+
 export default function Leaderboard({
   players,
   pct,
@@ -35,14 +65,41 @@ export default function Leaderboard({
   minPA: number;
 }) {
   const [sort, setSort] = useState<{ k: string; dir: 1 | -1 }>({ k: "Hitting+", dir: -1 });
+  const [teamFilter, setTeamFilter] = useState("");
+  const [posFilter, setPosFilter] = useState("");
+
+  const names = useMemo(() => Array.from(new Set(players.map((p) => p.player_name))), [players]);
+  const info = usePlayerInfo(names);
+  const resolvedCount = useMemo(() => names.filter((n) => n in info).length, [names, info]);
+
+  const teamOptions = useMemo(() => {
+    const set = new Set<string>();
+    for (const n of names) {
+      const t = info[n]?.team;
+      if (t) set.add(t);
+    }
+    return Array.from(set).sort();
+  }, [names, info]);
+
+  const posOptions = useMemo(() => {
+    const set = new Set<string>();
+    for (const n of names) {
+      const p = info[n]?.position;
+      if (p) set.add(p);
+    }
+    return Array.from(set).sort();
+  }, [names, info]);
 
   const rows: Row[] = useMemo(() => {
-    return players.map((r) => {
-      const hp = pct["Hitting+"](r["Hitting+"]);
-      const xp = pct["xwoba"](r.xwoba);
-      return { ...r, gap: hp != null && xp != null ? hp - xp : null };
-    });
-  }, [players, pct]);
+    return players
+      .filter((r) => !teamFilter || info[r.player_name]?.team === teamFilter)
+      .filter((r) => !posFilter || info[r.player_name]?.position === posFilter)
+      .map((r) => {
+        const hp = pct["Hitting+"](r["Hitting+"]);
+        const xp = pct["xwoba"](r.xwoba);
+        return { ...r, gap: hp != null && xp != null ? hp - xp : null };
+      });
+  }, [players, pct, teamFilter, posFilter, info]);
 
   const sorted = useMemo(() => {
     const copy = [...rows];
@@ -66,6 +123,8 @@ export default function Leaderboard({
     setSort((s) => (s.k === k ? { k, dir: (s.dir * -1) as 1 | -1 } : { k, dir: k === "player_name" ? 1 : -1 }));
   }
 
+  const loadingInfo = resolvedCount < names.length;
+
   return (
     <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] px-5 py-6 shadow-[var(--panel-shadow)] sm:px-7 sm:py-6">
       <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-2">
@@ -74,6 +133,43 @@ export default function Leaderboard({
         </h2>
         <span className="text-xs text-[var(--dimmer)]">{sorted.length} shown</span>
       </div>
+
+      <div className="mb-3.5 flex flex-wrap items-center gap-2.5">
+        <select
+          value={teamFilter}
+          onChange={(e) => setTeamFilter(e.target.value)}
+          className="rounded-lg border border-[var(--rule)] bg-white px-2.5 py-1.5 text-xs text-[var(--text)]"
+        >
+          <option value="">All teams</option>
+          {teamOptions.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
+        <select
+          value={posFilter}
+          onChange={(e) => setPosFilter(e.target.value)}
+          className="rounded-lg border border-[var(--rule)] bg-white px-2.5 py-1.5 text-xs text-[var(--text)]"
+        >
+          <option value="">All positions</option>
+          {posOptions.map((p) => (
+            <option key={p} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+        {loadingInfo && (
+          <span className="text-[11px] text-[var(--dimmer)]">
+            loading teams and positions ({resolvedCount}/{names.length})...
+          </span>
+        )}
+      </div>
+      <p className="mb-3.5 -mt-1 text-[11px] text-[var(--dimmer)]">
+        Team and position come from each player&apos;s current MLB roster listing, not the roster for the selected
+        season, so a traded or moved player may show under a different team than they played for that year.
+      </p>
+
       <div className="max-h-[70vh] overflow-auto rounded-[10px] border border-[var(--rule)]">
         <table className="w-full min-w-[680px] border-collapse text-sm">
           <thead>
@@ -94,47 +190,57 @@ export default function Leaderboard({
             </tr>
           </thead>
           <tbody>
-            {sorted.map((r) => (
-              <tr
-                key={r.player_name}
-                onClick={() => onSelect(r.player_name)}
-                className="cursor-pointer border-t border-[var(--rule)] hover:bg-[var(--track)]"
-              >
-                <td className="px-2.5 py-2 text-left font-medium hover:text-[var(--accent)]">
-                  <span className="flex items-center gap-2">
-                    <Headshot name={r.player_name} size={22} />
-                    {r.player_name}
-                  </span>
-                </td>
-                {COLUMNS.slice(1).map((c) => {
-                  const value = c.key === "gap" ? r.gap : (r[c.key as keyof Row] as number | null);
-                  const p50 = c.pctKey ? pct[c.pctKey](value) : c.key === "gap" ? null : null;
-                  const color =
-                    c.key === "gap"
-                      ? r.gap == null
-                        ? "var(--dim)"
-                        : r.gap > 25
-                        ? "var(--accent)"
-                        : r.gap < -25
-                        ? "var(--cool)"
-                        : "var(--dim)"
-                      : p50 != null
-                      ? ramp(p50)
-                      : "var(--text)";
-                  const digits = c.key === "xwoba" ? 3 : 0;
-                  const text = c.key === "gap" ? (r.gap == null ? "--" : fmtSigned(r.gap, 0)) : fmtNum(value, digits);
-                  return (
-                    <td
-                      key={c.key}
-                      className={`px-2.5 py-2 text-right tabular-nums ${c.key === "Hitting+" || c.key === "gap" ? "font-bold" : ""}`}
-                      style={{ color }}
-                    >
-                      {text}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+            {sorted.map((r) => {
+              const rowInfo = info[r.player_name];
+              return (
+                <tr
+                  key={r.player_name}
+                  onClick={() => onSelect(r.player_name)}
+                  className="cursor-pointer border-t border-[var(--rule)] hover:bg-[var(--track)]"
+                >
+                  <td className="px-2.5 py-2 text-left font-medium hover:text-[var(--accent)]">
+                    <span className="flex items-center gap-2">
+                      <Headshot name={r.player_name} size={22} />
+                      <span>
+                        <span className="block">{r.player_name}</span>
+                        {rowInfo && (rowInfo.team || rowInfo.position) && (
+                          <span className="block text-[11px] font-normal text-[var(--dimmer)]">
+                            {[rowInfo.team, rowInfo.position].filter(Boolean).join(" · ")}
+                          </span>
+                        )}
+                      </span>
+                    </span>
+                  </td>
+                  {COLUMNS.slice(1).map((c) => {
+                    const value = c.key === "gap" ? r.gap : (r[c.key as keyof Row] as number | null);
+                    const p50 = c.pctKey ? pct[c.pctKey](value) : c.key === "gap" ? null : null;
+                    const color =
+                      c.key === "gap"
+                        ? r.gap == null
+                          ? "var(--dim)"
+                          : r.gap > 25
+                          ? "var(--accent)"
+                          : r.gap < -25
+                          ? "var(--cool)"
+                          : "var(--dim)"
+                        : p50 != null
+                        ? ramp(p50)
+                        : "var(--text)";
+                    const digits = c.key === "xwoba" ? 3 : 0;
+                    const text = c.key === "gap" ? (r.gap == null ? "--" : fmtSigned(r.gap, 0)) : fmtNum(value, digits);
+                    return (
+                      <td
+                        key={c.key}
+                        className={`px-2.5 py-2 text-right tabular-nums ${c.key === "Hitting+" || c.key === "gap" ? "font-bold" : ""}`}
+                        style={{ color }}
+                      >
+                        {text}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
