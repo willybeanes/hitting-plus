@@ -20,7 +20,7 @@ This project uses **Bun** instead of `npm`. It is a single program that installs
 packages and runs the app, and it is faster than the alternatives. If you already
 have `npm` installed and prefer it, every command below also works with `npm`
 in place of `bun` (for example `npm install` instead of `bun install`, `npm run
-dev` instead of `bun run dev`) — skip to step 2 in that case.
+dev` instead of `bun run dev`). In that case, skip to step 2.
 
 Check whether you already have Bun:
 
