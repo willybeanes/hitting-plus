@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hitting+ Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0D1218; --panel:#151D26; --panel2:#1B2530; --rule:#26323F;
+  --text:#E6EDF4; --dim:#78889A; --dimmer:#4E5C6B;
+  --green:#1D9C52; --green-dim:#146B39; --clay:#C25B42; --amber:#C9922F;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --cond:'IBM Plex Sans Condensed','IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--text);font-family:var(--sans);
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+
+/* ---------- masthead ---------- */
+header{border-bottom:1px solid var(--rule);padding:26px 0 20px;margin-bottom:26px}
+.mast{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+h1{font-family:var(--cond);font-weight:700;font-size:30px;letter-spacing:-0.01em}
+h1 .plus{color:var(--green)}
+.tag{color:var(--dim);font-size:13px;max-width:46ch}
+.srcline{margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--dimmer)}
+
+/* ---------- controls ---------- */
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:22px}
+input[type=search],select{background:var(--panel);border:1px solid var(--rule);
+  color:var(--text);font-family:var(--sans);font-size:14px;padding:9px 12px;border-radius:3px}
+input[type=search]{min-width:260px;flex:1}
+input[type=search]:focus,select:focus,button:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+select{font-family:var(--mono);font-size:13px}
+.hint{color:var(--dimmer);font-size:12px;font-family:var(--mono)}
+
+/* ---------- results dropdown ---------- */
+.searchwrap{position:relative;flex:1;min-width:260px}
+.results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--panel2);
+  border:1px solid var(--rule);border-radius:3px;max-height:300px;overflow:auto;z-index:20}
+.results div{padding:8px 12px;cursor:pointer;font-size:14px;display:flex;
+  justify-content:space-between;gap:12px}
+.results div:hover,.results div[aria-selected=true]{background:var(--green-dim)}
+.results .r-h{font-family:var(--mono);color:var(--dim);font-size:12px}
+.results div:hover .r-h{color:var(--text)}
+
+/* ---------- card ---------- */
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:4px;
+  padding:26px 28px;margin-bottom:18px}
+.chead{display:flex;justify-content:space-between;align-items:flex-start;
+  gap:20px;flex-wrap:wrap;padding-bottom:20px;border-bottom:1px solid var(--rule)}
+.pname{font-family:var(--cond);font-weight:700;font-size:34px;line-height:1.05;
+  letter-spacing:-0.01em}
+.pmeta{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:6px}
+.hero{text-align:right;flex-shrink:0}
+.hero .n{font-family:var(--mono);font-weight:600;font-size:52px;line-height:1;
+  letter-spacing:-0.02em}
+.hero .lbl{font-family:var(--mono);font-size:11px;color:var(--dim);
+  text-transform:uppercase;letter-spacing:.14em;margin-top:4px}
+.hero .pct{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:2px}
+
+/* ---------- the swing sequence ---------- */
+.sect{margin-top:26px}
+.sect h2{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--dim);
+  text-transform:uppercase;letter-spacing:.16em;margin-bottom:16px}
+.seq{position:relative;padding-left:26px}
+.seq::before{content:'';position:absolute;left:7px;top:10px;bottom:14px;
+  width:1px;background:var(--rule)}
+.step{position:relative;margin-bottom:18px}
+.step:last-child{margin-bottom:0}
+.step::before{content:'';position:absolute;left:-23px;top:6px;width:9px;height:9px;
+  border-radius:50%;background:var(--panel);border:1px solid var(--dimmer)}
+.step.on::before{background:var(--green);border-color:var(--green)}
+.srow{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.sq{font-family:var(--mono);font-size:11px;color:var(--dimmer);letter-spacing:.1em}
+.sname{font-weight:600;font-size:15px}
+.sask{color:var(--dim);font-size:13px}
+.sval{margin-left:auto;font-family:var(--mono);font-weight:600;font-size:17px}
+.track{height:7px;background:#0A0F14;border-radius:4px;position:relative;overflow:hidden}
+.fill{position:absolute;top:0;bottom:0;left:0;border-radius:4px;
+  transition:width .5s cubic-bezier(.2,.7,.3,1)}
+.mid{position:absolute;top:-2px;bottom:-2px;left:50%;width:1px;background:var(--dimmer)}
+.sfoot{font-family:var(--mono);font-size:11px;color:var(--dimmer);margin-top:5px}
+
+/* ---------- contact diagram ---------- */
+.diagram{background:#0A0F14;border:1px solid var(--rule);border-radius:3px;padding:18px 20px 12px}
+.dlegend{font-family:var(--mono);font-size:11px;color:var(--dim);
+  display:flex;gap:18px;flex-wrap:wrap;margin-top:12px}
+.dlegend b{font-weight:500}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;
+  margin-right:5px;vertical-align:middle}
+
+/* ---------- comparison ---------- */
+.vs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.vs>div{background:var(--panel);padding:14px 16px}
+.vs .k{font-family:var(--mono);font-size:11px;color:var(--dim);
+  text-transform:uppercase;letter-spacing:.1em}
+.vs .v{font-family:var(--mono);font-size:22px;font-weight:600;margin-top:5px}
+.vs .s{font-family:var(--mono);font-size:11px;color:var(--dimmer);margin-top:2px}
+.read{margin-top:14px;padding:13px 16px;background:var(--panel2);
+  border-left:2px solid var(--green);border-radius:0 3px 3px 0;font-size:14px}
+.read.warn{border-left-color:var(--amber)}
+
+/* ---------- table ---------- */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--dim);
+  text-transform:uppercase;letter-spacing:.1em;text-align:right;padding:0 10px 9px;
+  cursor:pointer;user-select:none;white-space:nowrap}
+th:first-child{text-align:left}
+th:hover{color:var(--text)}
+th[data-active]{color:var(--green)}
+td{padding:8px 10px;border-top:1px solid var(--rule);text-align:right;
+  font-family:var(--mono);font-size:13px}
+td:first-child{text-align:left;font-family:var(--sans);cursor:pointer}
+tbody tr:hover{background:var(--panel2)}
+tbody tr:hover td:first-child{color:var(--green)}
+
+.empty{padding:44px 28px;text-align:center;color:var(--dim);
+  background:var(--panel);border:1px solid var(--rule);border-radius:4px}
+.empty b{display:block;color:var(--text);font-size:16px;margin-bottom:7px;font-weight:600}
+.empty code{font-family:var(--mono);font-size:12px;color:var(--green);
+  background:#0A0F14;padding:2px 6px;border-radius:2px}
+.filebtn{margin-top:16px;font-family:var(--sans);font-size:14px;
+  background:var(--green-dim);border:1px solid var(--green);color:var(--text);
+  padding:9px 16px;border-radius:3px;cursor:pointer}
+.filebtn:hover{background:var(--green)}
+footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--rule);
+  font-size:12px;color:var(--dimmer);line-height:1.7}
+@media (max-width:620px){
+  .hero{text-align:left} .hero .n{font-size:40px} .pname{font-size:26px}
+  .sval{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="mast">
+    <h1>Hitting<span class="plus">+</span></h1>
+    <p class="tag">Four graded inputs, in the order a swing happens. Every component
+    measures the swing itself, never the result.</p>
+  </div>
+  <p class="srcline" id="srcline">no data loaded</p>
+</header>
+
+<div class="bar">
+  <div class="searchwrap">
+    <input type="search" id="q" placeholder="Search a hitter" autocomplete="off"
+           aria-label="Search a hitter" disabled>
+    <div class="results" id="results" hidden></div>
+  </div>
+  <select id="season" aria-label="Season" disabled></select>
+  <span class="hint" id="count"></span>
+</div>
+
+<div id="card"></div>
+
+<div class="card" id="boardwrap" hidden>
+  <h2 style="font-family:var(--mono);font-size:11px;color:var(--dim);
+    text-transform:uppercase;letter-spacing:.16em;margin-bottom:14px">
+    Every qualified hitter</h2>
+  <div style="overflow-x:auto"><table id="board">
+    <thead><tr>
+      <th data-k="player_name">Hitter</th>
+      <th data-k="Hitting+">Hitting+</th>
+      <th data-k="Decision+">Decision+</th>
+      <th data-k="Swing+">Swing+</th>
+      <th data-k="Contact+">Contact+</th>
+      <th data-k="Power+">Power+</th>
+      <th data-k="xwoba">xwOBA</th>
+      <th data-k="gap">Gap</th>
+    </tr></thead>
+    <tbody></tbody>
+  </table></div>
+</div>
+
+<footer>
+  Grades are built from Statcast pitch tracking, 2024 to 2026, and calibrated against
+  xwOBA. Decision+ scores swing and take choices against the league optimum for that
+  pitch and count. Swing+ measures contact timing, specifically how far out front a
+  hitter is on soft stuff relative to fastballs. Contact+ is whiff avoidance.
+  Power+ combines location-adjusted bat speed with location-adjusted lift.
+  <br><br>
+  Hitting+ is refit on all four components rather than averaged, because the
+  components correlate and averaging counts the same tendency more than once.
+  It grades the swing, so it cannot see baserunning: hitters who stretch singles
+  into doubles will beat their grade by design.
+</footer>
+
+</div>
+
+<script>
+const F = ['Decision+','Swing+','Contact+','Power+'];
+const ASK = {'Decision+':'whether to swing','Swing+':'when the bat arrived',
+             'Contact+':'did the bat find it','Power+':'what the swing brought'};
+const NOTE = {
+  'Decision+':d=>`chases ${pct(d.swing_rate)} of everything he sees`,
+  'Swing+':d=>`${fx(d.fooled,1)} in early on soft stuff vs fastballs`,
+  'Contact+':d=>`misses ${pct(d.whiff_rate)} of his swings`,
+  'Power+':d=>`bat speed ${fx(d.paBS,1)} mph, lift ${fx(d.paAA,1)} deg vs expected`};
+
+let DATA=[], SEASON=null, SORT={k:'Hitting+',dir:-1}, PICK=null;
+const $=s=>document.querySelector(s);
+const pct=v=>v==null?'--':(v*100).toFixed(0)+'%';
+const fx=(v,n)=>v==null?'--':(v>=0?'+':'')+v.toFixed(n);
+const num=(v,n)=>v==null?'--':v.toFixed(n);
+
+// colour ramp: clay at the bottom, neutral at league average, green at the top
+function ramp(p){
+  if(p==null) return 'var(--dimmer)';
+  if(p<50) return `color-mix(in oklab, var(--clay) ${(50-p)*1.7}%, var(--dim))`;
+  return `color-mix(in oklab, var(--green) ${(p-50)*1.85}%, var(--dim))`;
+}
+
+function season(){ return DATA.filter(r=>r.game_year===SEASON); }
+
+function percentiles(){
+  const rows=season(), out={};
+  [...F,'xwoba','Hitting+'].forEach(k=>{
+    const v=rows.map(r=>r[k]).filter(x=>x!=null).sort((a,b)=>a-b);
+    out[k]=x=>x==null?null:100*v.filter(y=>y<x).length/v.length;
+  });
+  return out;
+}
+
+function leagueDepth(){
+  const rows=season(), m={};
+  ['depth_FB','depth_BR','depth_OS'].forEach(k=>{
+    const v=rows.map(r=>r[k]).filter(x=>x!=null);
+    m[k]=v.length? v.reduce((a,b)=>a+b,0)/v.length : 0;
+  });
+  return m;
+}
+
+/* ---------- the signature: where the bat meets the ball ---------- */
+function diagram(d, lg){
+  const fams=[['depth_FB','Fastball','#E6EDF4'],
+              ['depth_BR','Breaking','#6FA8DC'],
+              ['depth_OS','Offspeed','#C9922F']];
+  const have=fams.filter(f=>d[f[0]]!=null);
+  if(!have.length) return '<p class="hint">No timing data for this season.</p>';
+  const all=have.flatMap(f=>[d[f[0]]-lg[f[0]]]);
+  const lim=Math.max(4,Math.ceil(Math.max(...all.map(Math.abs))+1));
+  const W=640,H=132,PAD=44, x=v=>PAD+((v+lim)/(2*lim))*(W-2*PAD);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img"
+    aria-label="Contact depth by pitch type versus league average">`;
+  // baseline and league marker
+  s+=`<line x1="${PAD}" y1="${H-30}" x2="${W-PAD}" y2="${H-30}" stroke="#26323F"/>`;
+  s+=`<line x1="${x(0)}" y1="18" x2="${x(0)}" y2="${H-24}" stroke="#4E5C6B"
+      stroke-dasharray="2 3"/>`;
+  s+=`<text x="${x(0)}" y="${H-10}" fill="#78889A" font-family="IBM Plex Mono"
+      font-size="10" text-anchor="middle">league average</text>`;
+  s+=`<text x="${PAD}" y="14" fill="#4E5C6B" font-family="IBM Plex Mono"
+      font-size="10">later</text>`;
+  s+=`<text x="${W-PAD}" y="14" fill="#4E5C6B" font-family="IBM Plex Mono"
+      font-size="10" text-anchor="end">earlier</text>`;
+  have.forEach((f,i)=>{
+    const dev=d[f[0]]-lg[f[0]], px=x(dev), y=34+i*26;
+    s+=`<line x1="${x(0)}" y1="${y}" x2="${px}" y2="${y}" stroke="${f[2]}"
+        stroke-opacity=".35" stroke-width="1.5"/>`;
+    s+=`<circle cx="${px}" cy="${y}" r="5" fill="${f[2]}"/>`;
+    s+=`<text x="${px}" y="${y-9}" fill="${f[2]}" font-family="IBM Plex Mono"
+        font-size="11" text-anchor="middle">${fx(dev,1)}"</text>`;
+  });
+  s+='</svg>';
+  return s;
+}
+
+function render(){
+  const wrap=$('#card');
+  if(!PICK){ wrap.innerHTML=''; return; }
+  const P=percentiles(), lg=leagueDepth(), d=PICK;
+  const hp=P['Hitting+'](d['Hitting+']), xp=P['xwoba'](d.xwoba);
+  const gap=(hp!=null&&xp!=null)?hp-xp:null;
+
+  let steps='';
+  F.forEach((k,i)=>{
+    const p=P[k](d[k]), w=Math.max(2,Math.min(100,p==null?0:p));
+    steps+=`<div class="step ${p>=50?'on':''}">
+      <div class="srow"><span class="sq">${i+1}</span>
+        <span class="sname">${k}</span>
+        <span class="sask">${ASK[k]}</span>
+        <span class="sval" style="color:${ramp(p)}">${num(d[k],0)}</span></div>
+      <div class="track"><span class="mid"></span>
+        <span class="fill" style="width:${w}%;background:${ramp(p)}"></span></div>
+      <div class="sfoot">${p==null?'--':p.toFixed(0)+'th percentile'} &middot; ${NOTE[k](d)}</div>
+    </div>`;
+  });
+
+  let read='', cls='';
+  if(gap!=null){
+    if(gap>25){ cls='warn';
+      read=`The swing grades far better than the batted balls. Something after
+      contact is not going his way, or the model is seeing skills the results
+      have not paid out yet.`;
+    } else if(gap<-25){ cls='warn';
+      read=`He is producing well beyond what the swing itself explains.
+      ${d.extra_bases>0.04?`He also takes ${fx(d.extra_bases,2)} extra bases per
+      batted ball, which Hitting+ cannot see because it grades the bat, not the legs.`
+      :`His extra bases are unremarkable, so this gap is not baserunning. It is the
+      model missing something about how he hits.`}`;
+    } else {
+      read=`Grade and results line up. What the swing looks like is what it produced.`;
+    }
+  }
+
+  wrap.innerHTML=`<div class="card">
+    <div class="chead">
+      <div><div class="pname">${d.player_name}</div>
+        <div class="pmeta">${d.game_year} &middot; ${d.pitches.toLocaleString()} pitches
+          &middot; ${d.swings.toLocaleString()} swings &middot; ${d.pa} PA</div></div>
+      <div class="hero"><div class="n" style="color:${ramp(hp)}">${num(d['Hitting+'],0)}</div>
+        <div class="lbl">Hitting+</div>
+        <div class="pct">${hp==null?'':hp.toFixed(0)+'th percentile'}</div></div>
+    </div>
+
+    <div class="sect"><h2>The swing, in order</h2>
+      <div class="seq">${steps}</div></div>
+
+    <div class="sect"><h2>Where he meets the ball</h2>
+      <div class="diagram">${diagram(d,lg)}
+        <div class="dlegend">
+          <span><i class="swatch" style="background:#E6EDF4"></i><b>Fastball</b></span>
+          <span><i class="swatch" style="background:#6FA8DC"></i><b>Breaking</b></span>
+          <span><i class="swatch" style="background:#C9922F"></i><b>Offspeed</b></span>
+        </div></div>
+      <p class="sfoot" style="margin-top:9px">Inches in front of the league average
+      contact point for each pitch type. Everyone is early on soft stuff. Being
+      further right means more fooled.</p></div>
+
+    <div class="sect"><h2>Grade against results</h2>
+      <div class="vs">
+        <div><div class="k">Hitting+</div><div class="v" style="color:${ramp(hp)}">
+          ${hp==null?'--':hp.toFixed(0)}</div><div class="s">percentile</div></div>
+        <div><div class="k">xwOBA</div><div class="v">${num(d.xwoba,3)}</div>
+          <div class="s">${xp==null?'':xp.toFixed(0)+'th pctile'}</div></div>
+        <div><div class="k">wOBA</div><div class="v">${num(d.woba,3)}</div>
+          <div class="s">actual</div></div>
+        <div><div class="k">Extra bases</div><div class="v">${fx(d.extra_bases,2)}</div>
+          <div class="s">per batted ball</div></div>
+      </div>
+      ${read?`<div class="read ${cls}">${read}</div>`:''}
+    </div>
+  </div>`;
+}
+
+function board(){
+  const P=percentiles();
+  const rows=season().map(r=>{
+    const hp=P['Hitting+'](r['Hitting+']), xp=P['xwoba'](r.xwoba);
+    return {...r, gap:(hp!=null&&xp!=null)?hp-xp:null};
+  });
+  rows.sort((a,b)=>{
+    const A=a[SORT.k],B=b[SORT.k];
+    if(typeof A==='string') return SORT.dir*A.localeCompare(B);
+    return SORT.dir*((A??-1e9)-(B??-1e9));
+  });
+  $('#board tbody').innerHTML=rows.map(r=>`<tr data-n="${r.player_name}">
+    <td>${r.player_name}</td>
+    <td style="color:${ramp(P['Hitting+'](r['Hitting+']))}">${num(r['Hitting+'],0)}</td>
+    <td>${num(r['Decision+'],0)}</td><td>${num(r['Swing+'],0)}</td>
+    <td>${num(r['Contact+'],0)}</td><td>${num(r['Power+'],0)}</td>
+    <td>${num(r.xwoba,3)}</td>
+    <td style="color:${r.gap>25?'var(--green)':r.gap<-25?'var(--clay)':'var(--dim)'}">
+      ${r.gap==null?'--':fx(r.gap,0)}</td></tr>`).join('');
+  document.querySelectorAll('#board th').forEach(th=>
+    th.toggleAttribute('data-active', th.dataset.k===SORT.k));
+  $('#count').textContent=`${rows.length} qualified`;
+}
+
+function search(term){
+  const box=$('#results');
+  if(!term){ box.hidden=true; return; }
+  const t=term.toLowerCase();
+  const hits=season().filter(r=>r.player_name.toLowerCase().includes(t))
+    .sort((a,b)=>b['Hitting+']-a['Hitting+']).slice(0,9);
+  if(!hits.length){ box.innerHTML='<div class="r-h">No hitter by that name</div>';
+    box.hidden=false; return; }
+  box.innerHTML=hits.map(r=>`<div data-n="${r.player_name}">${r.player_name}
+    <span class="r-h">${num(r['Hitting+'],0)}</span></div>`).join('');
+  box.hidden=false;
+}
+
+function choose(name){
+  PICK=season().find(r=>r.player_name===name)||null;
+  $('#results').hidden=true; $('#q').value=name;
+  render(); window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function boot(rows, label){
+  DATA=rows;
+  const yrs=[...new Set(rows.map(r=>r.game_year))].sort((a,b)=>b-a);
+  SEASON=yrs[0];
+  $('#season').innerHTML=yrs.map(y=>`<option value="${y}">${y}</option>`).join('');
+  $('#season').disabled=false; $('#q').disabled=false;
+  $('#srcline').textContent=label;
+  $('#boardwrap').hidden=false;
+  const best=season().sort((a,b)=>b['Hitting+']-a['Hitting+'])[0];
+  PICK=best||null;
+  if(best) $('#q').value=best.player_name;
+  render(); board();
+}
+
+$('#q').addEventListener('input',e=>search(e.target.value.trim()));
+$('#q').addEventListener('focus',e=>search(e.target.value.trim()));
+$('#results').addEventListener('click',e=>{
+  const el=e.target.closest('[data-n]'); if(el) choose(el.dataset.n);});
+$('#season').addEventListener('change',e=>{
+  SEASON=+e.target.value;
+  PICK=PICK?season().find(r=>r.player_name===PICK.player_name)||null:null;
+  render(); board();});
+document.querySelectorAll('#board th').forEach(th=>th.addEventListener('click',()=>{
+  const k=th.dataset.k;
+  SORT = SORT.k===k ? {k,dir:-SORT.dir} : {k,dir:k==='player_name'?1:-1};
+  board();}));
+$('#board').addEventListener('click',e=>{
+  const tr=e.target.closest('tr[data-n]'); if(tr) choose(tr.dataset.n);});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.searchwrap')) $('#results').hidden=true;});
+
+function fail(){
+  $('#card').innerHTML=`<div class="empty">
+    <b>No data file found</b>
+    Put <code>swingplus_latest.json</code> next to this page, or load one from
+    your machine. The engine writes it to <code>output/publish/</code>.
+    <br><input type="file" id="fi" accept=".json" hidden>
+    <button class="filebtn" onclick="document.getElementById('fi').click()">
+      Choose a file</button></div>`;
+  $('#fi').addEventListener('change',ev=>{
+    const f=ev.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{ try{
+      const j=JSON.parse(r.result);
+      boot(j.players||j.rows||j, `loaded from ${f.name}`);
+    }catch(err){ $('#card').innerHTML=
+      `<div class="empty"><b>That file did not parse</b>${err.message}</div>`; } };
+    r.readAsText(f);});
+}
+
+(async()=>{
+  for(const u of ['swingplus_latest.json','output/publish/swingplus_latest.json']){
+    try{ const r=await fetch(u); if(!r.ok) continue;
+      const j=await r.json();
+      boot(j.players||j.rows||j, `${u} &middot; generated ${j.generated||'unknown'}`);
+      return;
+    }catch(e){}
+  }
+  fail();
+})();
+</script>
+</body>
+</html>

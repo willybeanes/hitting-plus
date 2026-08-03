@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(npm -v)",
+      "Bash(bun --version)",
+      "Bash(npm --version)",
+      "Read(//Users/will/.bun/bin/**)",
+      "Bash(bunx --version)",
+      "Bash(bun create *)"
+    ]
+  }
+}
