@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: "Hitting+ Explorer",
   description:
     "Four graded inputs to a swing, in the order they happen: Decision+, Timing+, Contact+ and Power+, refit into Hitting+.",
+  icons: {
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%E2%9A%BE</text></svg>",
+  },
 };
 
 export default function RootLayout({
