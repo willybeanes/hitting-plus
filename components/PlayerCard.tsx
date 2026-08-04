@@ -13,7 +13,7 @@ interface Props {
   player: Player;
   pct: PctRecord;
   leagueDepth: Record<DepthKey, number>;
-  eliteDepth: Record<DepthKey, number>;
+  eliteGap: Record<"depth_BR" | "depth_OS", number>;
   history: Player[];
   pctBySeason: Record<number, PctRecord>;
   onSelectSeason: (year: number) => void;
@@ -26,7 +26,7 @@ export default function PlayerCard({
   player: d,
   pct,
   leagueDepth,
-  eliteDepth,
+  eliteGap,
   history,
   pctBySeason,
   onSelectSeason,
@@ -152,10 +152,10 @@ export default function PlayerCard({
           Where he meets the ball
         </h2>
         <div className="rounded-[10px] border border-[var(--rule)] bg-[var(--track)] px-4 pb-3 pt-[18px] sm:px-5">
-          <ContactDiagram player={d} leagueDepth={leagueDepth} eliteDepth={eliteDepth} />
+          <ContactDiagram player={d} leagueDepth={leagueDepth} eliteGap={eliteGap} />
         </div>
         <p className="mt-2 text-[11px] text-[var(--dimmer)]">
-          {`Each dot is where ${d.player_name.split(",")[0]} makes contact on that pitch type, in inches in front of the league average contact point. Further right means further out front, and further right on soft stuff means more fooled. The triangle marks where the league's best hitters sit on that same pitch type (90th percentile), so you can see the gap to elite, not just to average.`}
+          {`Fastball is ${d.player_name.split(",")[0]}'s own baseline. Each dot shows how many inches later he meets that pitch type than he meets a fastball, which is exactly what Timing+ grades: the gap, not how early or late he is compared to other hitters. The open circle marks a typical hitter's gap and the triangle marks the least-fooled hitters' gap (90th percentile), so a hitter can look ordinary on any one pitch type and still have a large or small gap.`}
         </p>
       </div>
 

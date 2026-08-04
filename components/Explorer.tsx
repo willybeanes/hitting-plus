@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { COMPONENT_KEYS, DepthKey, SwingPlusData } from "@/lib/types";
-import { buildPercentiles, fieldPercentileValue, leagueMean } from "@/lib/metrics";
+import { buildPercentiles, leagueMean, pairedFieldPercentileValue } from "@/lib/metrics";
 import { FOOTER_COPY, PA_FILTER_NOTE } from "@/lib/copy";
 import SearchBox from "./SearchBox";
 import PlayerCard from "./PlayerCard";
@@ -105,11 +105,15 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
     return out;
   }, [qualifiedSeasonPlayers]);
 
-  const eliteDepth = useMemo(() => {
-    const out = {} as Record<DepthKey, number>;
-    for (const k of DEPTH_KEYS) out[k] = fieldPercentileValue(qualifiedSeasonPlayers, k, 10) ?? leagueDepth[k];
-    return out;
-  }, [qualifiedSeasonPlayers, leagueDepth]);
+  // The gap between a hitter's own breaking/offspeed depth and their own fastball depth
+  // is what "fooled" and Timing+ actually grade, so the elite reference is the least-fooled
+  // hitters' gap (10th percentile of that per-player difference), not the best raw depth.
+  const eliteGap = useMemo(() => {
+    return {
+      depth_BR: pairedFieldPercentileValue(qualifiedSeasonPlayers, "depth_BR", "depth_FB", 10) ?? 0,
+      depth_OS: pairedFieldPercentileValue(qualifiedSeasonPlayers, "depth_OS", "depth_FB", 10) ?? 0,
+    };
+  }, [qualifiedSeasonPlayers]);
 
   // Reflect the current view in the URL so it can be bookmarked or shared. Guarded so it
   // only replaces when the query actually differs, since useSearchParams re-suspends the
@@ -231,7 +235,7 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
             player={picked}
             pct={pct}
             leagueDepth={leagueDepth}
-            eliteDepth={eliteDepth}
+            eliteGap={eliteGap}
             history={playerHistory}
             pctBySeason={pctBySeason}
             onSelectSeason={selectSeason}

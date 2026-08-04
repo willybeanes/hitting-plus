@@ -54,6 +54,31 @@ export function fieldPercentileValue(players: Player[], key: keyof Player, p: nu
   return values[idx];
 }
 
+/**
+ * Value at percentile p (0 to 100) of the per-player difference (keyA - keyB), ignoring
+ * players missing either field. Used for the contact diagram's fooled-gap reference
+ * lines, where the meaningful quantity is each hitter's own breaking/offspeed depth
+ * minus their own fastball depth, not either field's standing against league average.
+ */
+export function pairedFieldPercentileValue(
+  players: Player[],
+  keyA: keyof Player,
+  keyB: keyof Player,
+  p: number
+): number | null {
+  const diffs = players
+    .map((pl) => {
+      const a = pl[keyA];
+      const b = pl[keyB];
+      return typeof a === "number" && typeof b === "number" ? a - b : null;
+    })
+    .filter((v): v is number => v != null)
+    .sort((a, b) => a - b);
+  if (diffs.length === 0) return null;
+  const idx = Math.min(diffs.length - 1, Math.max(0, Math.round((p / 100) * (diffs.length - 1))));
+  return diffs[idx];
+}
+
 export function fmtNum(v: number | null | undefined, digits: number): string {
   if (v == null) return "--";
   return v.toFixed(digits);
