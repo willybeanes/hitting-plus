@@ -194,7 +194,7 @@ export default function PlayerCard({
           <PowerDiagram player={d} leagueBS={leagueBS} leagueAA={leagueAA} eliteBS={eliteBS} eliteAA={eliteAA} />
         </div>
         <p className="mt-2 text-[11px] text-[var(--dimmer)]">
-          {`Bat speed and attack angle at the moment of contact, both adjusted for pitch location since hitters naturally swing slower and steeper on some locations regardless of ability. Together these are what Power+ grades. Dotted lines mark a typical hitter and the 90th-percentile hitter on each axis independently, so the elite lines don't represent one hitter's actual pairing.`}
+          {`Bat speed and attack angle at the moment of contact, both adjusted for pitch location since hitters naturally swing slower and steeper on some locations regardless of ability. Together these are what Power+ grades. Dotted lines mark a typical hitter and the 90th-percentile hitter on each axis independently.`}
         </p>
       </div>
 
