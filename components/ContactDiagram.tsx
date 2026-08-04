@@ -106,11 +106,9 @@ export default function ContactDiagram({
             </text>
             <line x1={x(0)} y1={y} x2={px} y2={y} stroke={f.color} strokeOpacity={0.35} strokeWidth={1.5} />
             <circle cx={lx} cy={y} r={3} fill="none" stroke="var(--dimmer)" strokeWidth={1.5} />
-            {i === 0 && (
-              <text x={lx} y={y + 22} fill="var(--dimmer)" fontFamily="var(--font-dm-sans)" fontWeight={600} fontSize="10" textAnchor="middle">
-                typical
-              </text>
-            )}
+            <text x={lx} y={y + 22} fill="var(--dimmer)" fontFamily="var(--font-dm-sans)" fontWeight={600} fontSize="10" textAnchor="middle">
+              typical
+            </text>
             <line x1={ex} y1={y - 11} x2={ex} y2={y + 11} stroke="var(--accent)" strokeWidth={1.5} opacity={0.8} />
             {i === 0 && (
               <text x={ex} y={y + 22} fill="var(--accent)" fontFamily="var(--font-dm-sans)" fontWeight={600} fontSize="10" textAnchor="middle">
