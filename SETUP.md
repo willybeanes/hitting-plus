@@ -121,6 +121,31 @@ can watch the deployment progress on your project's page at vercel.com.
 
 ---
 
+## 5. Refreshing team and position (leaderboard filters)
+
+The data file has no team or position column, so the leaderboard's team/position
+filters come from a separate file, `public/data/player_info.json`. It is a one-time
+snapshot resolved from MLB's public player directory, not looked up live, so it is
+fast and does not depend on any outside service while people are using the site.
+It goes stale as players get traded, called up, or optioned, so re-run it
+occasionally and whenever you update the main data file with new player names:
+
+```bash
+bun run resolve-players
+```
+
+You should see it count up to the total number of players and finish with
+`Wrote N entries ... to public/data/player_info.json`. Then commit and push it
+the same way as the main data file:
+
+```bash
+git add public/data/player_info.json
+git commit -m "Refresh player team/position snapshot"
+git push
+```
+
+---
+
 ## Troubleshooting
 
 - **`bun: command not found`**: close and reopen Terminal after installing Bun

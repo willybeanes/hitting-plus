@@ -1,23 +1,36 @@
 import { COMPONENT_KEYS, ComponentKey, CONF_FIELD, DepthKey, Player } from "@/lib/types";
 import { confidenceOpacity, confidenceTier, fmtNum, fmtPercentile, fmtSigned, ordinal } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
-import { COMPONENT_ASK, COMPONENT_NOTE, CONFIDENCE_NOTE } from "@/lib/copy";
+import { COMPONENT_ASK, CONFIDENCE_NOTE } from "@/lib/copy";
 import ContactDiagram from "./ContactDiagram";
 import Headshot from "./Headshot";
+import YearOverYear from "./YearOverYear";
 
 type PctFn = (x: number | null | undefined) => number | null;
+type PctRecord = Record<ComponentKey | "Hitting+" | "xwoba", PctFn>;
 
 interface Props {
   player: Player;
-  pct: Record<ComponentKey | "Hitting+" | "xwoba", PctFn>;
+  pct: PctRecord;
   leagueDepth: Record<DepthKey, number>;
   eliteDepth: Record<DepthKey, number>;
+  history: Player[];
+  pctBySeason: Record<number, PctRecord>;
+  onSelectSeason: (year: number) => void;
 }
 
 const GAP_HIGH = 25;
 const GAP_LOW = -25;
 
-export default function PlayerCard({ player: d, pct, leagueDepth, eliteDepth }: Props) {
+export default function PlayerCard({
+  player: d,
+  pct,
+  leagueDepth,
+  eliteDepth,
+  history,
+  pctBySeason,
+  onSelectSeason,
+}: Props) {
   const hp = pct["Hitting+"](d["Hitting+"]);
   const xp = pct["xwoba"](d.xwoba);
   const gap = hp != null && xp != null ? hp - xp : null;
@@ -128,10 +141,6 @@ export default function PlayerCard({ player: d, pct, leagueDepth, eliteDepth }: 
                     style={{ width: `${w}%`, background: color }}
                   />
                 </div>
-                <div className="mt-1 text-[11px] text-[var(--dimmer)]">
-                  {p == null ? "--" : `${ordinal(p)} percentile`} &middot; {COMPONENT_NOTE[k](d)}
-                  {tier !== "full" && conf != null && <> &middot; {CONFIDENCE_NOTE}</>}
-                </div>
               </div>
             );
           })}
@@ -144,31 +153,13 @@ export default function PlayerCard({ player: d, pct, leagueDepth, eliteDepth }: 
         </h2>
         <div className="rounded-[10px] border border-[var(--rule)] bg-[var(--track)] px-4 pb-3 pt-[18px] sm:px-5">
           <ContactDiagram player={d} leagueDepth={leagueDepth} eliteDepth={eliteDepth} />
-          <div className="mt-3 flex flex-wrap gap-4 text-[11px] text-[var(--dim)]">
-            <span>
-              <i className="mr-1.5 inline-block h-[9px] w-[9px] rounded-sm align-middle" style={{ background: "#1a1a1a" }} />
-              <b className="font-semibold">Fastball</b>
-            </span>
-            <span>
-              <i className="mr-1.5 inline-block h-[9px] w-[9px] rounded-sm align-middle" style={{ background: "#7fa0cb" }} />
-              <b className="font-semibold">Breaking</b>
-            </span>
-            <span>
-              <i className="mr-1.5 inline-block h-[9px] w-[9px] rounded-sm align-middle" style={{ background: "#c9922f" }} />
-              <b className="font-semibold">Offspeed</b>
-            </span>
-            <span>
-              <i className="mr-1.5 inline-block h-0 w-0 align-middle" style={{ borderLeft: "4px solid transparent", borderRight: "4px solid transparent", borderBottom: "6px solid var(--accent)" }} />
-              <b className="font-semibold">Elite (90th pctile)</b>
-            </span>
-          </div>
         </div>
         <p className="mt-2 text-[11px] text-[var(--dimmer)]">
-          Inches in front of the league average contact point for each pitch type. Everyone is early on soft stuff.
-          Further right means more fooled. The triangle marks where the league&apos;s best hitters sit on each pitch
-          type, so you can see the gap to elite, not just to average.
+          {`Each dot is where ${d.player_name.split(",")[0]} makes contact on that pitch type, in inches in front of the league average contact point. Further right means further out front, and further right on soft stuff means more fooled. The triangle marks where the league's best hitters sit on that same pitch type (90th percentile), so you can see the gap to elite, not just to average.`}
         </p>
       </div>
+
+      <YearOverYear history={history} pctBySeason={pctBySeason} currentSeason={d.game_year} onSelectSeason={onSelectSeason} />
 
       <div className="mt-6">
         <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--dim)]">

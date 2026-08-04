@@ -81,7 +81,23 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
     [seasonPlayers, pickedName]
   );
 
-  const pct = useMemo(() => buildPercentiles(qualifiedSeasonPlayers, PCT_KEYS), [qualifiedSeasonPlayers]);
+  // Percentile functions for every season, not just the selected one, so the year-over-year
+  // table can color each season by that season's own qualified pool.
+  const pctBySeason = useMemo(() => {
+    const map: Record<number, ReturnType<typeof buildPercentiles<(typeof PCT_KEYS)[number]>>> = {};
+    for (const s of seasons) {
+      const qualified = data.players.filter((p) => p.game_year === s && p.qualified);
+      map[s] = buildPercentiles(qualified, PCT_KEYS);
+    }
+    return map;
+  }, [data.players, seasons]);
+
+  const pct = pctBySeason[season];
+
+  const playerHistory = useMemo(
+    () => (pickedName ? data.players.filter((p) => p.player_name === pickedName) : []),
+    [data.players, pickedName]
+  );
 
   const leagueDepth = useMemo(() => {
     const out = {} as Record<DepthKey, number>;
@@ -118,6 +134,10 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
     setPickedName(name);
     setTab("card");
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  const selectSeason = useCallback((year: number) => {
+    setSeason(year);
   }, []);
 
   return (
@@ -207,7 +227,15 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
 
       {tab === "card" &&
         (picked ? (
-          <PlayerCard player={picked} pct={pct} leagueDepth={leagueDepth} eliteDepth={eliteDepth} />
+          <PlayerCard
+            player={picked}
+            pct={pct}
+            leagueDepth={leagueDepth}
+            eliteDepth={eliteDepth}
+            history={playerHistory}
+            pctBySeason={pctBySeason}
+            onSelectSeason={selectSeason}
+          />
         ) : (
           <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] px-7 py-11 text-center text-[var(--dim)] shadow-[var(--panel-shadow)]">
             <p className="mb-1.5 text-base font-semibold text-[var(--text)]">No hitter selected</p>
