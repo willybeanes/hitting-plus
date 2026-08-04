@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { COMPONENT_KEYS, DepthKey, SwingPlusData } from "@/lib/types";
-import { buildPercentiles, leagueMean, pairedFieldPercentileValue } from "@/lib/metrics";
+import { buildPercentiles, fieldPercentileValue, leagueMean, pairedFieldPercentileValue } from "@/lib/metrics";
 import { FOOTER_COPY, PA_FILTER_NOTE } from "@/lib/copy";
 import SearchBox from "./SearchBox";
 import PlayerCard from "./PlayerCard";
@@ -114,6 +114,26 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
       depth_OS: pairedFieldPercentileValue(qualifiedSeasonPlayers, "depth_OS", "depth_FB", 10) ?? 0,
     };
   }, [qualifiedSeasonPlayers]);
+
+  // Whiff rate: lower is better, so "elite" is the 10th percentile.
+  const leagueWhiff = useMemo(() => leagueMean(qualifiedSeasonPlayers, "whiff_rate"), [qualifiedSeasonPlayers]);
+  const eliteWhiff = useMemo(
+    () => fieldPercentileValue(qualifiedSeasonPlayers, "whiff_rate", 10) ?? 0,
+    [qualifiedSeasonPlayers]
+  );
+
+  // Bat speed and lift, both already expressed as deltas versus expected, so higher is
+  // better on both axes and "elite" is the 90th percentile of each independently.
+  const leagueBS = useMemo(() => leagueMean(qualifiedSeasonPlayers, "paBS"), [qualifiedSeasonPlayers]);
+  const leagueAA = useMemo(() => leagueMean(qualifiedSeasonPlayers, "paAA"), [qualifiedSeasonPlayers]);
+  const eliteBS = useMemo(
+    () => fieldPercentileValue(qualifiedSeasonPlayers, "paBS", 90) ?? 0,
+    [qualifiedSeasonPlayers]
+  );
+  const eliteAA = useMemo(
+    () => fieldPercentileValue(qualifiedSeasonPlayers, "paAA", 90) ?? 0,
+    [qualifiedSeasonPlayers]
+  );
 
   // Reflect the current view in the URL so it can be bookmarked or shared. Guarded so it
   // only replaces when the query actually differs, since useSearchParams re-suspends the
@@ -236,6 +256,12 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
             pct={pct}
             leagueDepth={leagueDepth}
             eliteGap={eliteGap}
+            leagueWhiff={leagueWhiff}
+            eliteWhiff={eliteWhiff}
+            leagueBS={leagueBS}
+            leagueAA={leagueAA}
+            eliteBS={eliteBS}
+            eliteAA={eliteAA}
             history={playerHistory}
             pctBySeason={pctBySeason}
             onSelectSeason={selectSeason}

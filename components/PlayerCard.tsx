@@ -3,6 +3,8 @@ import { confidenceOpacity, confidenceTier, fmtNum, fmtPercentile, fmtSigned, or
 import { ramp } from "@/lib/ramp";
 import { COMPONENT_ASK, CONFIDENCE_NOTE } from "@/lib/copy";
 import ContactDiagram from "./ContactDiagram";
+import WhiffDiagram from "./WhiffDiagram";
+import PowerDiagram from "./PowerDiagram";
 import Headshot from "./Headshot";
 import YearOverYear from "./YearOverYear";
 
@@ -14,6 +16,12 @@ interface Props {
   pct: PctRecord;
   leagueDepth: Record<DepthKey, number>;
   eliteGap: Record<"depth_BR" | "depth_OS", number>;
+  leagueWhiff: number;
+  eliteWhiff: number;
+  leagueBS: number;
+  leagueAA: number;
+  eliteBS: number;
+  eliteAA: number;
   history: Player[];
   pctBySeason: Record<number, PctRecord>;
   onSelectSeason: (year: number) => void;
@@ -27,6 +35,12 @@ export default function PlayerCard({
   pct,
   leagueDepth,
   eliteGap,
+  leagueWhiff,
+  eliteWhiff,
+  leagueBS,
+  leagueAA,
+  eliteBS,
+  eliteAA,
   history,
   pctBySeason,
   onSelectSeason,
@@ -156,7 +170,31 @@ export default function PlayerCard({
           <ContactDiagram player={d} leagueDepth={leagueDepth} eliteGap={eliteGap} />
         </div>
         <p className="mt-2 text-[11px] text-[var(--dimmer)]">
-          {`Fastball is ${d.player_name.split(",")[0]}'s own baseline. Each dot shows how many inches later he meets that pitch type than he meets a fastball, which is exactly what Timing+ grades: the gap, not how early or late he is compared to other hitters. The open circle marks a typical hitter's gap and the triangle marks the least-fooled hitters' gap (90th percentile), so a hitter can look ordinary on any one pitch type and still have a large or small gap.`}
+          {`Fastball is ${d.player_name.split(",")[0]}'s own baseline. Each dot shows how many inches later he meets that pitch type than he meets a fastball, which is exactly what Timing+ grades: the gap, not how early or late he is compared to other hitters. The open circle marks a typical hitter's gap and the line marks the least-fooled hitters' gap (90th percentile), so a hitter can look ordinary on any one pitch type and still have a large or small gap.`}
+        </p>
+      </div>
+
+      <div className="mt-6">
+        <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--dim)]">
+          Whether he made contact
+        </h2>
+        <div className="rounded-[10px] border border-[var(--rule)] bg-[var(--track)] px-4 pb-3 pt-[18px] sm:px-5">
+          <WhiffDiagram player={d} leagueWhiff={leagueWhiff} eliteWhiff={eliteWhiff} />
+        </div>
+        <p className="mt-2 text-[11px] text-[var(--dimmer)]">
+          {`Share of ${d.player_name.split(",")[0]}'s swings that missed entirely, exactly what Contact+ grades. The open circle marks a typical hitter's whiff rate and the line marks the least-whiff hitters' rate (10th percentile).`}
+        </p>
+      </div>
+
+      <div className="mt-6">
+        <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--dim)]">
+          What the bat did on contact
+        </h2>
+        <div className="rounded-[10px] border border-[var(--rule)] bg-[var(--track)] px-4 pb-3 pt-[18px] sm:px-5">
+          <PowerDiagram player={d} leagueBS={leagueBS} leagueAA={leagueAA} eliteBS={eliteBS} eliteAA={eliteAA} />
+        </div>
+        <p className="mt-2 text-[11px] text-[var(--dimmer)]">
+          {`Bat speed and attack angle at the moment of contact, both adjusted for pitch location since hitters naturally swing slower and steeper on some locations regardless of ability. Together these are what Power+ grades. Dotted lines mark a typical hitter and the 90th-percentile hitter on each axis independently, so the elite lines don't represent one hitter's actual pairing.`}
         </p>
       </div>
 

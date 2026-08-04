@@ -59,10 +59,10 @@ export default function ContactDiagram({
         same as his fastball
       </text>
       <text x={PAD_LEFT} y={12} fill="var(--dimmer)" fontFamily="var(--font-dm-sans)" fontSize="10">
-        less fooled
+        on time
       </text>
       <text x={W - PAD_RIGHT} y={12} fill="var(--dimmer)" fontFamily="var(--font-dm-sans)" fontSize="10" textAnchor="end">
-        more fooled
+        off time
       </text>
 
       <g>

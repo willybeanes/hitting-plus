@@ -4,7 +4,7 @@ import { fmtPct, fmtSigned } from "./metrics";
 export const COMPONENT_ASK: Record<ComponentKey, string> = {
   "Decision+": "whether to swing",
   "Timing+": "when the bat arrived",
-  "Contact+": "did the bat find it",
+  "Contact+": "did the bat meet the pitch",
   "Power+": "what the swing brought",
 };
 
