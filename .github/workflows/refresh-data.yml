@@ -1,0 +1,38 @@
+name: Refresh player/wRC+ snapshots
+
+on:
+  schedule:
+    # Every Monday at 06:00 America/Chicago (11:00 UTC during CDT).
+    - cron: "0 11 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install
+
+      # player_info.json has the MLBAM ids fetch-wrc-plus joins on, so it must run first.
+      - run: bun run resolve-players
+      - run: bun run fetch-wrc-plus
+
+      - name: Commit and push if the snapshots changed
+        run: |
+          if git diff --quiet -- public/data/player_info.json public/data/wrc_plus.json; then
+            echo "No changes to player_info.json or wrc_plus.json, skipping commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data/player_info.json public/data/wrc_plus.json
+          git commit -m "Refresh player team/position and wRC+ snapshots"
+          git push
