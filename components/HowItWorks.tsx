@@ -126,7 +126,7 @@ export default function HowItWorks() {
   return (
     <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] p-4 shadow-[var(--panel-shadow)] sm:p-6">
       <div className="lg:grid lg:grid-cols-[360px_1fr] lg:items-start lg:gap-8">
-        <div className="mb-6 lg:sticky lg:top-6 lg:mb-0">
+        <div className="mb-6 lg:sticky lg:top-1/2 lg:mb-0 lg:-translate-y-1/2">
           <DiagramPanel activeId={activeId} level={level} />
         </div>
 
