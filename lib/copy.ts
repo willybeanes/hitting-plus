@@ -36,5 +36,5 @@ export const CONFIDENCE_NOTE =
   "Sample is short, so this grade is pulled toward league average.";
 
 export const FOOTER_COPY = [
-  "Hitting+ grades from Statcast pitch tracking, 2024 to 2026, calibrated against xwOBA. Decision+, Timing+, Contact+ and Power+ each grade one part of the swing, in the order it happens. Hitting+ is a regression refit on all four, not an average of them, since the components correlate and averaging would count the same tendency more than once.",
+  "Hitting+ grades from Statcast pitch tracking, 2024 to 2026, calibrated against xwOBA. Decision+, Timing+, Contact+ and Power+ each grade one part of the swing, in the order it happens.",
 ];
