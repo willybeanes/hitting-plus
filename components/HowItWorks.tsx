@@ -216,7 +216,7 @@ function DiagramPanel({ activeId, level }: { activeId: string; level: number }) 
         </div>
       </div>
 
-      {activeId === "scale" && (
+      {(activeId === "scale" || activeId === "limits") && (
         <div className="mt-5 border-t border-[var(--rule)] pt-4">
           <div className="relative h-[36px]">
             <div className="absolute left-0 right-0 top-[16px] h-px bg-[var(--rule)]" />
