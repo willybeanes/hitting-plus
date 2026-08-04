@@ -63,7 +63,7 @@ const STEPS: Step[] = [
     id: "limits",
     kicker: "Two honest limitations",
     title: "What Hitting+ can't see",
-    body: "It grades the swing, not the result, so it cannot see baserunning: a hitter who stretches singles into doubles beats his grade by design. And because bat speed carries the most weight in the fit, a hitter well below expected bat speed can grade in the bottom few percent even when his outcomes are league average. Both are real limits of the model, not bugs.",
+    body: "It grades the swing, not the result, so it cannot see baserunning: a hitter who stretches singles into doubles beats his grade by design. And because bat speed carries the most weight in the fit, a hitter well below expected bat speed can grade in the bottom few percent even when his outcomes are league average.",
   },
 ];
 
