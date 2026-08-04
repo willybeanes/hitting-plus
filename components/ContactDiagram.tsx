@@ -106,11 +106,27 @@ export default function ContactDiagram({
             </text>
             <line x1={x(0)} y1={y} x2={px} y2={y} stroke={f.color} strokeOpacity={0.35} strokeWidth={1.5} />
             <circle cx={lx} cy={y} r={3} fill="none" stroke="var(--dimmer)" strokeWidth={1.5} />
-            <text x={lx} y={y + 22} fill="var(--dimmer)" fontFamily="var(--font-dm-sans)" fontWeight={600} fontSize="10" textAnchor="middle">
+            <text
+              x={lx + (px < lx ? 8 : -8)}
+              y={y + 3}
+              fill="var(--dimmer)"
+              fontFamily="var(--font-dm-sans)"
+              fontWeight={600}
+              fontSize="10"
+              textAnchor={px < lx ? "start" : "end"}
+            >
               typical
             </text>
             <line x1={ex} y1={y - 11} x2={ex} y2={y + 11} stroke="var(--accent)" strokeWidth={1.5} opacity={0.8} />
-            <text x={ex} y={y + 22} fill="var(--accent)" fontFamily="var(--font-dm-sans)" fontWeight={600} fontSize="10" textAnchor="middle">
+            <text
+              x={ex + (px < ex ? 8 : -8)}
+              y={y + 3}
+              fill="var(--accent)"
+              fontFamily="var(--font-dm-sans)"
+              fontWeight={600}
+              fontSize="10"
+              textAnchor={px < ex ? "start" : "end"}
+            >
               elite
             </text>
             <circle cx={px} cy={y} r={5.5} fill={f.color} stroke="white" strokeWidth={1.5} />
