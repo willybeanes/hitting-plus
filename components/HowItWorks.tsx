@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { COMPONENT_DESC } from "@/lib/copy";
+import BatterAnimation from "./BatterAnimation";
 
 interface Step {
   id: string;
   kicker: string;
   title: string;
   body: string;
+  stage?: 0 | 1 | 2 | 3;
 }
 
 const STEPS: Step[] = [
@@ -22,24 +24,28 @@ const STEPS: Step[] = [
     kicker: "Step 1 of 4 · whether to swing",
     title: "Decision+",
     body: COMPONENT_DESC["Decision+"],
+    stage: 0,
   },
   {
     id: "timing",
     kicker: "Step 2 of 4 · when the bat arrived",
     title: "Timing+",
     body: COMPONENT_DESC["Timing+"],
+    stage: 1,
   },
   {
     id: "contact",
     kicker: "Step 3 of 4 · did the bat find it",
     title: "Contact+",
     body: COMPONENT_DESC["Contact+"],
+    stage: 2,
   },
   {
     id: "power",
     kicker: "Step 4 of 4 · what the swing brought",
     title: "Power+",
     body: COMPONENT_DESC["Power+"],
+    stage: 3,
   },
   {
     id: "hitting",
@@ -153,6 +159,9 @@ export default function HowItWorks() {
                 </p>
                 <h3 className="mb-3 text-2xl font-bold sm:text-[28px]">{s.title}</h3>
                 <p className="max-w-[52ch] text-[15px] leading-relaxed text-[var(--dim)]">{s.body}</p>
+                {s.stage !== undefined && (
+                  <BatterAnimation stage={s.stage} revealed={passed} label={`${s.title}: ${s.kicker}`} />
+                )}
               </div>
             );
           })}
