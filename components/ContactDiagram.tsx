@@ -110,11 +110,9 @@ export default function ContactDiagram({
               typical
             </text>
             <line x1={ex} y1={y - 11} x2={ex} y2={y + 11} stroke="var(--accent)" strokeWidth={1.5} opacity={0.8} />
-            {i === 0 && (
-              <text x={ex} y={y + 22} fill="var(--accent)" fontFamily="var(--font-dm-sans)" fontWeight={600} fontSize="10" textAnchor="middle">
-                elite
-              </text>
-            )}
+            <text x={ex} y={y + 22} fill="var(--accent)" fontFamily="var(--font-dm-sans)" fontWeight={600} fontSize="10" textAnchor="middle">
+              elite
+            </text>
             <circle cx={px} cy={y} r={5.5} fill={f.color} stroke="white" strokeWidth={1.5} />
             <text x={px} y={y - 12} fill={f.color} fontFamily="var(--font-dm-sans)" fontWeight={700} fontSize="12" textAnchor="middle">
               {fmtSigned(gap, 1)}&quot;
