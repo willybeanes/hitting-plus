@@ -50,6 +50,9 @@ export default function PowerDiagram({
       <text x={x(leagueBS)} y={PAD - 26} fill="var(--dimmer)" fontFamily="var(--font-dm-sans)" fontSize="10" textAnchor="middle">
         typical
       </text>
+      <text x={PAD - 8} y={y(leagueAA) + 3} fill="var(--dimmer)" fontFamily="var(--font-dm-sans)" fontSize="10" textAnchor="end">
+        typical
+      </text>
 
       {/* elite reference lines */}
       <line x1={x(eliteBS)} y1={PAD - 20} x2={x(eliteBS)} y2={H - PAD} stroke="var(--accent)" strokeDasharray="2 3" opacity={0.8} />
