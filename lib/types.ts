@@ -35,6 +35,10 @@ export interface Player {
   conf_timing: number | null;
   conf_contact: number | null;
   conf_power: number | null;
+  /** From FanGraphs, merged in at build time (see scripts/fetch-wrc-plus.ts). Not part
+   *  of the swingplus engine's own output, so it can be null even when everything else
+   *  on the row is present. */
+  wrc_plus: number | null;
 }
 
 export interface SwingPlusData {
@@ -47,6 +51,9 @@ export interface SwingPlusData {
 
 export const COMPONENT_KEYS = ["Decision+", "Timing+", "Contact+", "Power+"] as const;
 export type ComponentKey = (typeof COMPONENT_KEYS)[number];
+
+/** Every stat the app computes a within-season percentile for. */
+export type StatKey = ComponentKey | "Hitting+" | "xwoba" | "wrc_plus";
 
 export const DEPTH_KEYS = ["depth_FB", "depth_BR", "depth_OS"] as const;
 export type DepthKey = (typeof DEPTH_KEYS)[number];

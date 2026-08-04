@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ComponentKey, Player } from "@/lib/types";
+import { Player, StatKey } from "@/lib/types";
 import { fmtNum, fmtSigned } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
 import { MlbInfo, resolveMlbInfo } from "@/lib/headshot";
@@ -13,7 +13,7 @@ interface Row extends Player {
   gap: number | null;
 }
 
-const COLUMNS: { key: keyof Row | "gap"; label: string; pctKey?: ComponentKey | "Hitting+" | "xwoba" }[] = [
+const COLUMNS: { key: keyof Row | "gap"; label: string; pctKey?: StatKey }[] = [
   { key: "player_name", label: "Hitter" },
   { key: "Hitting+", label: "Hitting+", pctKey: "Hitting+" },
   { key: "Decision+", label: "Decision+", pctKey: "Decision+" },
@@ -21,6 +21,7 @@ const COLUMNS: { key: keyof Row | "gap"; label: string; pctKey?: ComponentKey | 
   { key: "Contact+", label: "Contact+", pctKey: "Contact+" },
   { key: "Power+", label: "Power+", pctKey: "Power+" },
   { key: "xwoba", label: "xwOBA", pctKey: "xwoba" },
+  { key: "wrc_plus", label: "wRC+", pctKey: "wrc_plus" },
   { key: "gap", label: "Gap" },
 ];
 
@@ -60,7 +61,7 @@ export default function Leaderboard({
   minPA,
 }: {
   players: Player[];
-  pct: Record<ComponentKey | "Hitting+" | "xwoba", PctFn>;
+  pct: Record<StatKey, PctFn>;
   onSelect: (name: string) => void;
   minPA: number;
 }) {

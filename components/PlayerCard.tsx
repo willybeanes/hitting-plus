@@ -1,4 +1,4 @@
-import { COMPONENT_KEYS, ComponentKey, CONF_FIELD, DepthKey, Player } from "@/lib/types";
+import { COMPONENT_KEYS, CONF_FIELD, DepthKey, Player, StatKey } from "@/lib/types";
 import { confidenceOpacity, confidenceTier, fmtNum, fmtPercentile, fmtSigned, ordinal } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
 import { COMPONENT_ASK, CONFIDENCE_NOTE } from "@/lib/copy";
@@ -7,7 +7,7 @@ import Headshot from "./Headshot";
 import YearOverYear from "./YearOverYear";
 
 type PctFn = (x: number | null | undefined) => number | null;
-type PctRecord = Record<ComponentKey | "Hitting+" | "xwoba", PctFn>;
+type PctRecord = Record<StatKey, PctFn>;
 
 interface Props {
   player: Player;
@@ -33,6 +33,7 @@ export default function PlayerCard({
 }: Props) {
   const hp = pct["Hitting+"](d["Hitting+"]);
   const xp = pct["xwoba"](d.xwoba);
+  const wp = pct["wrc_plus"](d.wrc_plus);
   const gap = hp != null && xp != null ? hp - xp : null;
 
   const hittingConf = d[CONF_FIELD["Hitting+"]] as number | null;
@@ -165,13 +166,22 @@ export default function PlayerCard({
         <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--dim)]">
           Grade against results
         </h2>
-        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[10px] border border-[var(--rule)] bg-[var(--rule)] sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[10px] border border-[var(--rule)] bg-[var(--rule)] sm:grid-cols-5">
           <div className="bg-[var(--panel)] px-4 py-3.5">
             <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">Hitting+</div>
             <div className="mt-1 text-xl font-bold tabular-nums" style={{ color: ramp(hp) }}>
               {hp == null ? "--" : hp.toFixed(0)}
             </div>
             <div className="mt-0.5 text-[11px] text-[var(--dimmer)]">percentile</div>
+          </div>
+          <div className="bg-[var(--panel)] px-4 py-3.5">
+            <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">wRC+</div>
+            <div className="mt-1 text-xl font-bold tabular-nums" style={{ color: ramp(wp) }}>
+              {fmtNum(d.wrc_plus, 0)}
+            </div>
+            <div className="mt-0.5 text-[11px] text-[var(--dimmer)]">
+              {wp == null ? "FanGraphs" : `${ordinal(wp)} pctile`}
+            </div>
           </div>
           <div className="bg-[var(--panel)] px-4 py-3.5">
             <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">xwOBA</div>

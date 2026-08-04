@@ -12,7 +12,22 @@ async function getData(): Promise<SwingPlusData | null> {
     // default allow_nan=True), which is not valid JSON. Treat NaN the same as the
     // documented null for missing values.
     const sanitized = raw.replace(/\bNaN\b/g, "null");
-    return JSON.parse(sanitized) as SwingPlusData;
+    const data = JSON.parse(sanitized) as SwingPlusData;
+
+    // wRC+ comes from FanGraphs, not the swingplus engine, so it lives in its own
+    // pre-fetched snapshot (see scripts/fetch-wrc-plus.ts) and gets merged in here.
+    const wrcFile = path.join(process.cwd(), "public", "data", "wrc_plus.json");
+    let wrcMap: Record<string, Record<string, number>> = {};
+    try {
+      wrcMap = JSON.parse(await fs.readFile(wrcFile, "utf8"));
+    } catch {
+      // Snapshot hasn't been generated yet; every player just gets a null wrc_plus below.
+    }
+    for (const p of data.players) {
+      p.wrc_plus = wrcMap[p.player_name]?.[String(p.game_year)] ?? null;
+    }
+
+    return data;
   } catch {
     return null;
   }

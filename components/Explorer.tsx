@@ -15,7 +15,7 @@ type Tab = "card" | "leaderboard" | "compare" | "how";
 const TAB_KEYS: Tab[] = ["card", "leaderboard", "compare", "how"];
 
 const DEPTH_KEYS: DepthKey[] = ["depth_FB", "depth_BR", "depth_OS"];
-const PCT_KEYS = [...COMPONENT_KEYS, "Hitting+", "xwoba"] as const;
+const PCT_KEYS = [...COMPONENT_KEYS, "Hitting+", "xwoba", "wrc_plus"] as const;
 const PA_PRESETS = [10, 50, 150, 300, 500];
 const DEFAULT_MIN_PA = 150;
 

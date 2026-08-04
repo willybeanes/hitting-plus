@@ -1,17 +1,18 @@
-import { ComponentKey, Player } from "@/lib/types";
+import { Player, StatKey } from "@/lib/types";
 import { fmtNum } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
 
 type PctFn = (x: number | null | undefined) => number | null;
-type PctRecord = Record<ComponentKey | "Hitting+" | "xwoba", PctFn>;
+type PctRecord = Record<StatKey, PctFn>;
 
-const COLUMNS: { key: ComponentKey | "Hitting+" | "xwoba"; label: string; digits: number }[] = [
+const COLUMNS: { key: StatKey; label: string; digits: number }[] = [
   { key: "Hitting+", label: "Hitting+", digits: 0 },
   { key: "Decision+", label: "Decision+", digits: 0 },
   { key: "Timing+", label: "Timing+", digits: 0 },
   { key: "Contact+", label: "Contact+", digits: 0 },
   { key: "Power+", label: "Power+", digits: 0 },
   { key: "xwoba", label: "xwOBA", digits: 3 },
+  { key: "wrc_plus", label: "wRC+", digits: 0 },
 ];
 
 export default function YearOverYear({

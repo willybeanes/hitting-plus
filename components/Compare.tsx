@@ -1,6 +1,6 @@
 "use client";
 
-import { COMPONENT_KEYS, ComponentKey, Player } from "@/lib/types";
+import { COMPONENT_KEYS, ComponentKey, Player, StatKey } from "@/lib/types";
 import { fmtNum, fmtSigned } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
 import { COMPONENT_ASK } from "@/lib/copy";
@@ -18,6 +18,7 @@ const ROWS: { key: keyof Player; label: string; digits: number; signed?: boolean
   { key: "Contact+", label: "Contact+", digits: 0 },
   { key: "Power+", label: "Power+", digits: 0 },
   { key: "xwoba", label: "xwOBA", digits: 3 },
+  { key: "wrc_plus", label: "wRC+", digits: 0 },
   { key: "woba", label: "wOBA", digits: 3 },
   { key: "extra_bases", label: "Extra bases", digits: 2, signed: true },
 ];
@@ -33,7 +34,7 @@ export default function Compare({
   players: Player[];
   /** PA-filtered pool offered in the "add a hitter" search. */
   searchPool: Player[];
-  pct: Record<ComponentKey | "Hitting+" | "xwoba", PctFn>;
+  pct: Record<StatKey, PctFn>;
   selected: string[];
   onChangeSelected: (names: string[]) => void;
 }) {
@@ -51,8 +52,13 @@ export default function Compare({
   }
 
   function pctFor(key: keyof Player, p: Player): number | null {
-    if (key === "Hitting+" || key === "xwoba" || COMPONENT_KEYS.includes(key as ComponentKey)) {
-      return pct[key as ComponentKey | "Hitting+" | "xwoba"](p[key] as number | null);
+    if (
+      key === "Hitting+" ||
+      key === "xwoba" ||
+      key === "wrc_plus" ||
+      COMPONENT_KEYS.includes(key as ComponentKey)
+    ) {
+      return pct[key as StatKey](p[key] as number | null);
     }
     return null;
   }

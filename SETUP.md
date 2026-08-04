@@ -146,6 +146,33 @@ git push
 
 ---
 
+## 6. Refreshing wRC+
+
+wRC+ is not part of the swingplus engine's output, so it comes from a separate
+static snapshot, `public/data/wrc_plus.json`, fetched from FanGraphs (via the same
+proxy pattern used by `fg-scatter`) and joined to our players by MLBAM id. It
+depends on `public/data/player_info.json` already existing, since that is where
+the MLBAM ids come from, so run `resolve-players` first if you have just added
+new player names. Re-run whenever you update the main data file with new seasons
+or players:
+
+```bash
+bun run fetch-wrc-plus
+```
+
+You should see it fetch each season and finish with `Wrote N player-seasons (M
+unmatched) to public/data/wrc_plus.json`. A handful of unmatched player-seasons is
+normal (very low-PA players sometimes fall outside FanGraphs' leaderboard). Then
+commit and push it the same way as the other data files:
+
+```bash
+git add public/data/wrc_plus.json
+git commit -m "Refresh wRC+ snapshot"
+git push
+```
+
+---
+
 ## Troubleshooting
 
 - **`bun: command not found`**: close and reopen Terminal after installing Bun

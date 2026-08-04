@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "resolve-players": "bun run scripts/resolve-players.ts"
+    "resolve-players": "bun run scripts/resolve-players.ts",
+    "fetch-wrc-plus": "bun run scripts/fetch-wrc-plus.ts"
   },
   "dependencies": {
     "next": "16.2.12",
