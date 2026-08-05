@@ -194,7 +194,7 @@ function DiagramPanel({ activeId, level }: { activeId: string; level: number }) 
               </div>
               <div className="relative h-[8px] overflow-hidden rounded-full bg-white">
                 <span
-                  className="absolute bottom-0 left-0 top-0 rounded-full bg-[var(--accent)]"
+                  className="gauge-fill absolute bottom-0 left-0 top-0 rounded-full bg-[var(--accent)]"
                   style={{ width: revealed ? `${b.pct}%` : "0%", transition: "width 900ms ease-out" }}
                 />
               </div>
@@ -212,7 +212,7 @@ function DiagramPanel({ activeId, level }: { activeId: string; level: number }) 
         </div>
         <div className="relative h-[12px] overflow-hidden rounded-full bg-white">
           <span
-            className="absolute bottom-0 left-0 top-0 rounded-full bg-[var(--text)]"
+            className="gauge-fill absolute bottom-0 left-0 top-0 rounded-full bg-[var(--text)]"
             style={{ width: level >= 5 ? `${HITTING_PCT}%` : "0%", transition: "width 900ms ease-out" }}
           />
         </div>

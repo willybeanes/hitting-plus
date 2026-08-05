@@ -57,6 +57,14 @@ export default function WhiffDiagram({
       </text>
 
       <circle cx={lx} cy={AXIS_Y} r={3} fill="none" stroke="var(--dimmer)" strokeWidth={1.5} />
+      <rect
+        x={px < lx ? lx + 5 : lx - 5 - 44}
+        y={AXIS_Y - 6}
+        width={44}
+        height={13}
+        fill="var(--track)"
+        opacity={0.88}
+      />
       <text
         x={lx + (px < lx ? 8 : -8)}
         y={AXIS_Y + 3}
@@ -69,6 +77,14 @@ export default function WhiffDiagram({
       </text>
 
       <line x1={ex} y1={AXIS_Y - 11} x2={ex} y2={AXIS_Y + 11} stroke="var(--accent)" strokeWidth={1.5} opacity={0.8} />
+      <rect
+        x={px < ex ? ex + 5 : ex - 5 - 32}
+        y={AXIS_Y - 6}
+        width={32}
+        height={13}
+        fill="var(--track)"
+        opacity={0.88}
+      />
       <text
         x={ex + (px < ex ? 8 : -8)}
         y={AXIS_Y + 3}

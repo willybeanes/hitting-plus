@@ -106,6 +106,14 @@ export default function ContactDiagram({
             </text>
             <line x1={x(0)} y1={y} x2={px} y2={y} stroke={f.color} strokeOpacity={0.35} strokeWidth={1.5} />
             <circle cx={lx} cy={y} r={3} fill="none" stroke="var(--dimmer)" strokeWidth={1.5} />
+            <rect
+              x={px < lx ? lx + 5 : lx - 5 - 44}
+              y={y - 6}
+              width={44}
+              height={13}
+              fill="var(--track)"
+              opacity={0.88}
+            />
             <text
               x={lx + (px < lx ? 8 : -8)}
               y={y + 3}
@@ -118,6 +126,14 @@ export default function ContactDiagram({
               typical
             </text>
             <line x1={ex} y1={y - 11} x2={ex} y2={y + 11} stroke="var(--accent)" strokeWidth={1.5} opacity={0.8} />
+            <rect
+              x={px < ex ? ex + 5 : ex - 5 - 32}
+              y={y - 6}
+              width={32}
+              height={13}
+              fill="var(--track)"
+              opacity={0.88}
+            />
             <text
               x={ex + (px < ex ? 8 : -8)}
               y={y + 3}

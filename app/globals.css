@@ -44,6 +44,13 @@ body {
   }
 }
 
+/* A slow linear width fill isn't the kind of motion prefers-reduced-motion is
+   meant to suppress (unlike parallax or spin), so this narrow class opts the
+   How It Works gauge bars back in even when that preference is set. */
+.gauge-fill {
+  transition-duration: 900ms !important;
+}
+
 ::selection {
   background: var(--accent-dim);
   color: var(--text);
