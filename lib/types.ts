@@ -26,6 +26,12 @@ export interface Player {
    *  and pitch family. Contact+ grades whiff_rate against this, not against a flat
    *  league average, so a hitter who sees tougher pitches isn't penalized for it. */
   exp_whiff: number | null;
+  /** Swing rate and average regret by strike-zone cell ("cx_cz", 0-indexed from
+   *  bottom-left, on a 5x5 grid plus a chase margin). regret is already calibrated
+   *  against the league-optimal choice for that location and count, so a value near
+   *  0 means good decisions there -- no separate typical/elite reference needed.
+   *  Cells with too few pitches for that player-season are simply absent. */
+  decision_zone: Record<string, { regret: number; swing_rate: number; n: number }> | null;
   paBS: number | null;
   paAA: number | null;
   fooled: number | null;
