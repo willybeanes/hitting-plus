@@ -16,8 +16,8 @@ interface Props {
   pct: PctRecord;
   leagueDepth: Record<DepthKey, number>;
   eliteGap: Record<"depth_BR" | "depth_OS", number>;
-  leagueWhiff: number;
-  eliteWhiff: number;
+  leagueWhiffGap: number;
+  eliteWhiffGap: number;
   leagueBS: number;
   leagueAA: number;
   eliteBS: number;
@@ -35,8 +35,8 @@ export default function PlayerCard({
   pct,
   leagueDepth,
   eliteGap,
-  leagueWhiff,
-  eliteWhiff,
+  leagueWhiffGap,
+  eliteWhiffGap,
   leagueBS,
   leagueAA,
   eliteBS,
@@ -179,10 +179,10 @@ export default function PlayerCard({
           Whether he made contact
         </h2>
         <div className="rounded-[10px] border border-[var(--rule)] bg-[var(--track)] px-4 pb-3 pt-[18px] sm:px-5">
-          <WhiffDiagram player={d} leagueWhiff={leagueWhiff} eliteWhiff={eliteWhiff} />
+          <WhiffDiagram player={d} leagueGap={leagueWhiffGap} eliteGap={eliteWhiffGap} />
         </div>
         <p className="mt-2 text-[11px] text-[var(--dimmer)]">
-          {`Share of ${d.player_name.split(",")[0]}'s swings that missed entirely, exactly what Contact+ grades. The open circle marks a typical hitter's whiff rate and the line marks the least-whiff hitters' rate (10th percentile).`}
+          {`How much more, or less, ${d.player_name.split(",")[0]} whiffed than expected given the location, count and pitch type he actually swung at, which is exactly what Contact+ grades: the gap, not the raw whiff rate, so a hitter who saw tougher pitches isn't penalized for it. The open circle marks a typical hitter's gap and the line marks the least-fooled hitters' gap (10th percentile).`}
         </p>
       </div>
 

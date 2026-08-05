@@ -1,23 +1,22 @@
 import { Player } from "@/lib/types";
-import { fmtPct } from "@/lib/metrics";
 
 export default function WhiffDiagram({
   player,
-  leagueWhiff,
-  eliteWhiff,
+  leagueGap,
+  eliteGap,
 }: {
   player: Player;
-  leagueWhiff: number;
-  eliteWhiff: number;
+  leagueGap: number;
+  eliteGap: number;
 }) {
-  if (player.whiff_rate == null) {
+  if (player.whiff_rate == null || player.exp_whiff == null) {
     return <p className="text-xs text-[var(--dim)]">No contact data for this season.</p>;
   }
-  const whiff = player.whiff_rate;
+  const gap = player.whiff_rate - player.exp_whiff;
 
-  const allX = [0, whiff, leagueWhiff, eliteWhiff];
-  const lo = 0;
-  const hi = Math.max(...allX) * 1.15;
+  const allX = [0, gap, leagueGap, eliteGap];
+  const lo = Math.min(...allX) - 0.02;
+  const hi = Math.max(...allX) + 0.02;
 
   const W = 640;
   const H = 92;
@@ -26,20 +25,25 @@ export default function WhiffDiagram({
   const AXIS_Y = 58;
   const x = (v: number) => PAD_LEFT + ((v - lo) / (hi - lo)) * (W - PAD_LEFT - PAD_RIGHT);
 
-  const px = x(whiff);
-  const lx = x(leagueWhiff);
-  const ex = x(eliteWhiff);
+  const px = x(gap);
+  const lx = x(leagueGap);
+  const ex = x(eliteGap);
+  const zx = x(0);
 
   return (
     <svg
       viewBox={`0 0 ${W} ${H}`}
       width="100%"
       role="img"
-      aria-label="Whiff rate compared to a typical hitter and the least-whiff hitters"
+      aria-label="Whiff rate versus his own expected whiff rate, compared to a typical hitter and the least-fooled hitters"
     >
       <line x1={PAD_LEFT} y1={AXIS_Y} x2={W - PAD_RIGHT} y2={AXIS_Y} stroke="var(--rule)" />
+      <line x1={zx} y1={AXIS_Y - 16} x2={zx} y2={AXIS_Y + 6} stroke="var(--dimmer)" strokeDasharray="2 3" />
+      <text x={zx} y={AXIS_Y + 20} fill="var(--dim)" fontFamily="var(--font-dm-sans)" fontSize="10" textAnchor="middle">
+        matched expectation
+      </text>
       <text x={PAD_LEFT} y={AXIS_Y - 30} fill="var(--dimmer)" fontFamily="var(--font-dm-sans)" fontSize="10">
-        fewer whiffs
+        fewer whiffs than expected
       </text>
       <text
         x={W - PAD_RIGHT}
@@ -49,23 +53,30 @@ export default function WhiffDiagram({
         fontSize="10"
         textAnchor="end"
       >
-        more whiffs
+        more whiffs than expected
       </text>
 
       <circle cx={lx} cy={AXIS_Y} r={3} fill="none" stroke="var(--dimmer)" strokeWidth={1.5} />
-      <text x={lx} y={AXIS_Y + 18} fill="var(--dimmer)" fontFamily="var(--font-dm-sans)" fontSize="10" textAnchor="middle">
+      <text
+        x={lx + (px < lx ? 8 : -8)}
+        y={AXIS_Y + 3}
+        fill="var(--dimmer)"
+        fontFamily="var(--font-dm-sans)"
+        fontSize="10"
+        textAnchor={px < lx ? "start" : "end"}
+      >
         typical
       </text>
 
       <line x1={ex} y1={AXIS_Y - 11} x2={ex} y2={AXIS_Y + 11} stroke="var(--accent)" strokeWidth={1.5} opacity={0.8} />
       <text
-        x={ex}
-        y={AXIS_Y + 22}
+        x={ex + (px < ex ? 8 : -8)}
+        y={AXIS_Y + 3}
         fill="var(--accent)"
         fontFamily="var(--font-dm-sans)"
         fontWeight={600}
         fontSize="10"
-        textAnchor="middle"
+        textAnchor={px < ex ? "start" : "end"}
       >
         elite
       </text>
@@ -73,14 +84,14 @@ export default function WhiffDiagram({
       <circle cx={px} cy={AXIS_Y} r={6} fill="var(--cool)" stroke="white" strokeWidth={1.5} />
       <text
         x={px}
-        y={AXIS_Y - 14}
+        y={AXIS_Y - 18}
         fill="#1a1a1a"
         fontFamily="var(--font-dm-sans)"
         fontWeight={700}
         fontSize="13"
         textAnchor="middle"
       >
-        {fmtPct(whiff)}
+        {`${gap >= 0 ? "+" : ""}${(gap * 100).toFixed(1)} pts`}
       </text>
     </svg>
   );

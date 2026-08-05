@@ -22,6 +22,10 @@ export interface Player {
   extra_bases: number | null;
   swing_rate: number | null;
   whiff_rate: number | null;
+  /** Expected whiff rate on the pitches he swung at, given their location, count,
+   *  and pitch family. Contact+ grades whiff_rate against this, not against a flat
+   *  league average, so a hitter who sees tougher pitches isn't penalized for it. */
+  exp_whiff: number | null;
   paBS: number | null;
   paAA: number | null;
   fooled: number | null;

@@ -115,10 +115,18 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
     };
   }, [qualifiedSeasonPlayers]);
 
-  // Whiff rate: lower is better, so "elite" is the 10th percentile.
-  const leagueWhiff = useMemo(() => leagueMean(qualifiedSeasonPlayers, "whiff_rate"), [qualifiedSeasonPlayers]);
-  const eliteWhiff = useMemo(
-    () => fieldPercentileValue(qualifiedSeasonPlayers, "whiff_rate", 10) ?? 0,
+  // Contact+ grades whiff_rate against exp_whiff (the expected whiff rate for the
+  // location, count and pitch type actually swung at), not a flat rate, so the
+  // meaningful quantity is that per-player gap. Elite is the 10th percentile of the
+  // gap (least worse than expected), matching the Timing+ pattern.
+  const leagueWhiffGap = useMemo(() => {
+    const gaps = qualifiedSeasonPlayers
+      .map((p) => (p.whiff_rate != null && p.exp_whiff != null ? p.whiff_rate - p.exp_whiff : null))
+      .filter((v): v is number => v != null);
+    return gaps.length ? gaps.reduce((a, b) => a + b, 0) / gaps.length : 0;
+  }, [qualifiedSeasonPlayers]);
+  const eliteWhiffGap = useMemo(
+    () => pairedFieldPercentileValue(qualifiedSeasonPlayers, "whiff_rate", "exp_whiff", 10) ?? 0,
     [qualifiedSeasonPlayers]
   );
 
@@ -256,8 +264,8 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
             pct={pct}
             leagueDepth={leagueDepth}
             eliteGap={eliteGap}
-            leagueWhiff={leagueWhiff}
-            eliteWhiff={eliteWhiff}
+            leagueWhiffGap={leagueWhiffGap}
+            eliteWhiffGap={eliteWhiffGap}
             leagueBS={leagueBS}
             leagueAA={leagueAA}
             eliteBS={eliteBS}

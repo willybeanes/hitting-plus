@@ -13,7 +13,8 @@ export const COMPONENT_DESC: Record<ComponentKey, string> = {
     "Scores every pitch by the run-value regret of the swing-or-take choice, against what a league-average hitter gets in that location, count and pitch type. A correct choice scores zero. Coin-flip pitches barely register.",
   "Timing+":
     "Measures when the bat arrived: specifically, how far out front a hitter makes contact on breaking and offspeed pitches relative to fastballs. Everyone is early on soft stuff. Staying back is the skill.",
-  "Contact+": "Whiff avoidance, scaled so higher is better.",
+  "Contact+":
+    "Whiff avoidance, graded against the expected whiff rate for the location, count and pitch type he actually swung at, not a flat league average. A hitter who sees a tougher mix of pitches isn't penalized for it.",
   "Power+":
     "Combines location-adjusted bat speed and location-adjusted attack angle, the lift term. Both are adjusted because contact point changes both measurements: hitters swing slower on high pitches and steeper on low ones regardless of ability.",
 };
@@ -22,7 +23,11 @@ export const COMPONENT_DESC: Record<ComponentKey, string> = {
 export const COMPONENT_NOTE: Record<ComponentKey, (d: Player) => string> = {
   "Decision+": (d) => `swings at ${fmtPct(d.swing_rate)} of pitches seen`,
   "Timing+": (d) => `${fmtSigned(d.fooled, 1)}" in front on soft stuff vs fastballs`,
-  "Contact+": (d) => `misses ${fmtPct(d.whiff_rate)} of his swings`,
+  "Contact+": (d) =>
+    `misses ${fmtPct(d.whiff_rate)} of his swings, ${fmtSigned(
+      d.whiff_rate != null && d.exp_whiff != null ? (d.whiff_rate - d.exp_whiff) * 100 : null,
+      1
+    )} pts vs expected`,
   "Power+": (d) => `bat speed ${fmtSigned(d.paBS, 1)} mph, lift ${fmtSigned(d.paAA, 1)} deg vs expected`,
 };
 
