@@ -2,7 +2,6 @@ import { COMPONENT_KEYS, CONF_FIELD, DepthKey, Player, StatKey } from "@/lib/typ
 import { confidenceOpacity, confidenceTier, fmtNum, fmtPercentile, fmtSigned, ordinal } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
 import { COMPONENT_ASK, CONFIDENCE_NOTE } from "@/lib/copy";
-import DecisionDiagram from "./DecisionDiagram";
 import ContactDiagram from "./ContactDiagram";
 import WhiffDiagram from "./WhiffDiagram";
 import PowerDiagram from "./PowerDiagram";
@@ -161,18 +160,6 @@ export default function PlayerCard({
             );
           })}
         </div>
-      </div>
-
-      <div className="mt-6">
-        <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--dim)]">
-          Whether he should have swung
-        </h2>
-        <div className="rounded-[10px] border border-[var(--rule)] bg-[var(--track)] px-4 pb-3 pt-[18px] sm:px-5">
-          <DecisionDiagram player={d} />
-        </div>
-        <p className="mt-2 text-[11px] text-[var(--dimmer)]">
-          {`Swing rate and decision quality by pitch location, from the catcher's view. Regret is already graded against the league-optimal swing-or-take choice for that exact location and count, which is exactly what Decision+ grades, so a cell near zero means good decisions there regardless of how often he swings. Cells need at least 15 pitches to show, so gaps in the grid are locations he didn't see enough of this season to judge.`}
-        </p>
       </div>
 
       <div className="mt-6">
