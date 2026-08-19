@@ -20,6 +20,10 @@ interface PlayerInfo {
   id: number;
   team: string | null;
   position: string | null;
+  /** Teams the player logged hitting stats for, keyed by season. A traded player has
+   *  more than one entry for a season. Used so the leaderboard's team filter reflects
+   *  the roster for the SELECTED season, not the player's current club. */
+  teamsBySeason: Record<string, string[]>;
 }
 
 interface MlbPerson {
@@ -27,6 +31,37 @@ interface MlbPerson {
   lastFirstName?: string;
   currentTeam?: { name?: string };
   primaryPosition?: { abbreviation?: string };
+}
+
+interface YearByYearSplit {
+  season?: string;
+  team?: { name?: string };
+}
+
+/** Fetches the year-by-year hitting splits for a player id and reduces them to the set
+ *  of MLB team abbreviations they played for in each season. Silent on failure — a
+ *  missing map just means that player can't be season-filtered. */
+async function resolveTeamsBySeason(id: number): Promise<Record<string, string[]>> {
+  try {
+    const res = await fetch(
+      `https://statsapi.mlb.com/api/v1/people/${id}/stats?stats=yearByYear&group=hitting`
+    );
+    if (!res.ok) return {};
+    const data = (await res.json()) as { stats?: { splits?: YearByYearSplit[] }[] };
+    const splits = data.stats?.[0]?.splits ?? [];
+    const bySeason: Record<string, Set<string>> = {};
+    for (const s of splits) {
+      const season = s.season;
+      const abbr = s.team?.name ? TEAM_ABBR[s.team.name] : undefined;
+      if (!season || !abbr) continue;
+      (bySeason[season] ??= new Set()).add(abbr);
+    }
+    const out: Record<string, string[]> = {};
+    for (const [season, set] of Object.entries(bySeason)) out[season] = Array.from(set).sort();
+    return out;
+  } catch {
+    return {};
+  }
 }
 
 async function resolveOne(name: string): Promise<PlayerInfo | null> {
@@ -47,6 +82,7 @@ async function resolveOne(name: string): Promise<PlayerInfo | null> {
     id: match.id,
     team: abbr ?? null,
     position: match.primaryPosition?.abbreviation ?? null,
+    teamsBySeason: await resolveTeamsBySeason(match.id),
   };
 }
 

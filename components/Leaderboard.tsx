@@ -59,6 +59,7 @@ export default function Leaderboard({
   pct,
   onSelect,
   minPA,
+  season,
   teamFilter,
   onChangeTeamFilter,
 }: {
@@ -66,9 +67,11 @@ export default function Leaderboard({
   pct: Record<StatKey, PctFn>;
   onSelect: (name: string) => void;
   minPA: number;
+  season: number;
   teamFilter: string;
   onChangeTeamFilter: (team: string) => void;
 }) {
+  const seasonKey = String(season);
   const [sort, setSort] = useState<{ k: string; dir: 1 | -1 }>({ k: "Hitting+", dir: -1 });
   const [posFilter, setPosFilter] = useState("");
 
@@ -79,11 +82,10 @@ export default function Leaderboard({
   const teamOptions = useMemo(() => {
     const set = new Set<string>();
     for (const n of names) {
-      const t = info[n]?.team;
-      if (t) set.add(t);
+      for (const t of info[n]?.teamsBySeason?.[seasonKey] ?? []) set.add(t);
     }
     return Array.from(set).sort();
-  }, [names, info]);
+  }, [names, info, seasonKey]);
 
   const posOptions = useMemo(() => {
     const set = new Set<string>();
@@ -96,14 +98,14 @@ export default function Leaderboard({
 
   const rows: Row[] = useMemo(() => {
     return players
-      .filter((r) => !teamFilter || info[r.player_name]?.team === teamFilter)
+      .filter((r) => !teamFilter || (info[r.player_name]?.teamsBySeason?.[seasonKey]?.includes(teamFilter) ?? false))
       .filter((r) => !posFilter || info[r.player_name]?.position === posFilter)
       .map((r) => {
         const hp = pct["Hitting+"](r["Hitting+"]);
         const xp = pct["xwoba"](r.xwoba);
         return { ...r, gap: hp != null && xp != null ? hp - xp : null };
       });
-  }, [players, pct, teamFilter, posFilter, info]);
+  }, [players, pct, teamFilter, posFilter, info, seasonKey]);
 
   const sorted = useMemo(() => {
     const copy = [...rows];
@@ -170,8 +172,8 @@ export default function Leaderboard({
         )}
       </div>
       <p className="mb-3.5 -mt-1 text-[11px] text-[var(--dimmer)]">
-        Team and position come from each player&apos;s current MLB roster listing, not the roster for the selected
-        season, so a traded or moved player may show under a different team than they played for that year.
+        Team reflects who the player logged plate appearances for in the selected season; a player traded mid-year
+        shows every club he hit for that year. Position comes from his current MLB roster listing.
       </p>
 
       <div className="max-h-[70vh] overflow-auto rounded-[10px] border border-[var(--rule)]">
@@ -196,6 +198,10 @@ export default function Leaderboard({
           <tbody>
             {sorted.map((r) => {
               const rowInfo = info[r.player_name];
+              // Team(s) for THIS season, so the label agrees with the season-aware filter;
+              // fall back to the current club only when no season history is available.
+              const seasonTeams = rowInfo?.teamsBySeason?.[seasonKey];
+              const teamLabel = seasonTeams?.length ? seasonTeams.join("/") : rowInfo?.team ?? null;
               return (
                 <tr
                   key={r.player_name}
@@ -207,9 +213,9 @@ export default function Leaderboard({
                       <Headshot name={r.player_name} size={22} />
                       <span>
                         <span className="block">{r.player_name}</span>
-                        {rowInfo && (rowInfo.team || rowInfo.position) && (
+                        {rowInfo && (teamLabel || rowInfo.position) && (
                           <span className="block text-[11px] font-normal text-[var(--dimmer)]">
-                            {[rowInfo.team, rowInfo.position].filter(Boolean).join(" · ")}
+                            {[teamLabel, rowInfo.position].filter(Boolean).join(" · ")}
                           </span>
                         )}
                       </span>

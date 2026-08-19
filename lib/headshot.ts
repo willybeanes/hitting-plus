@@ -5,6 +5,10 @@ export interface MlbInfo {
   id: number;
   team: string | null;
   position: string | null;
+  /** Teams the player logged hitting stats for, keyed by season (e.g. { "2025": ["BOS"] }).
+   *  Absent for names resolved only via the live fallback. Lets the leaderboard filter and
+   *  label by the roster for the selected season, not the player's current club. */
+  teamsBySeason?: Record<string, string[]>;
 }
 
 const infoCache = new Map<string, MlbInfo | null>();

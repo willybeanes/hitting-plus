@@ -289,6 +289,7 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
           pct={pct}
           onSelect={selectPlayer}
           minPA={minPA}
+          season={season}
           teamFilter={teamFilter}
           onChangeTeamFilter={setTeamFilter}
         />
