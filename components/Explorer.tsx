@@ -49,6 +49,7 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
     const q = searchParams.get("compare");
     return q ? q.split("|").filter(Boolean) : [];
   });
+  const [teamFilter, setTeamFilter] = useState<string>(() => searchParams.get("team") ?? "");
 
   const seasonPlayers = useMemo(
     () => data.players.filter((p) => p.game_year === season),
@@ -155,12 +156,13 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
     if (tab === "compare" && compareNames.length > 0) {
       params.set("compare", compareNames.join("|"));
     }
+    if (tab === "leaderboard" && teamFilter) params.set("team", teamFilter);
     const next = params.toString();
     if (next !== searchParams.toString()) {
       router.replace(`${pathname}?${next}`, { scroll: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab, season, pickedName, minPA, compareNames]);
+  }, [tab, season, pickedName, minPA, compareNames, teamFilter]);
 
   const selectPlayer = useCallback((name: string) => {
     setPickedName(name);
@@ -282,7 +284,14 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
         ))}
 
       {tab === "leaderboard" && (
-        <Leaderboard players={visiblePlayers} pct={pct} onSelect={selectPlayer} minPA={minPA} />
+        <Leaderboard
+          players={visiblePlayers}
+          pct={pct}
+          onSelect={selectPlayer}
+          minPA={minPA}
+          teamFilter={teamFilter}
+          onChangeTeamFilter={setTeamFilter}
+        />
       )}
 
       {tab === "compare" && (

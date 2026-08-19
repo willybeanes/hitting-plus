@@ -59,14 +59,17 @@ export default function Leaderboard({
   pct,
   onSelect,
   minPA,
+  teamFilter,
+  onChangeTeamFilter,
 }: {
   players: Player[];
   pct: Record<StatKey, PctFn>;
   onSelect: (name: string) => void;
   minPA: number;
+  teamFilter: string;
+  onChangeTeamFilter: (team: string) => void;
 }) {
   const [sort, setSort] = useState<{ k: string; dir: 1 | -1 }>({ k: "Hitting+", dir: -1 });
-  const [teamFilter, setTeamFilter] = useState("");
   const [posFilter, setPosFilter] = useState("");
 
   const names = useMemo(() => Array.from(new Set(players.map((p) => p.player_name))), [players]);
@@ -138,7 +141,7 @@ export default function Leaderboard({
       <div className="mb-3.5 flex flex-wrap items-center gap-2.5">
         <select
           value={teamFilter}
-          onChange={(e) => setTeamFilter(e.target.value)}
+          onChange={(e) => onChangeTeamFilter(e.target.value)}
           className="rounded-lg border border-[var(--rule)] bg-white px-2.5 py-1.5 text-xs text-[var(--text)]"
         >
           <option value="">All teams</option>
