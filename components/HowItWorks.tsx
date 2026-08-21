@@ -89,15 +89,19 @@ const HITTING_PCT = 74;
 
 export default function HowItWorks() {
   const [activeId, setActiveId] = useState<string>(STEPS[0].id);
+  const [animProgress, setAnimProgress] = useState(0);
   const stepRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // Picks whichever step's center is closest to the viewport center, so overlapping
   // tall steps never leave two candidates racing an IntersectionObserver callback.
+  // Also computes scroll progress (0→1) within that step for driving animations.
   useEffect(() => {
     function update() {
-      const viewportCenter = window.innerHeight / 2;
+      const vh = window.innerHeight;
+      const viewportCenter = vh / 2;
       let closestId: string | null = null;
       let closestDist = Infinity;
+      let closestProgress = 0;
       for (const step of STEPS) {
         const el = stepRefs.current[step.id];
         if (!el) continue;
@@ -107,9 +111,14 @@ export default function HowItWorks() {
         if (dist < closestDist) {
           closestDist = dist;
           closestId = step.id;
+          // 0 when step center is at 80% down viewport, 1 when at 20% down
+          closestProgress = Math.max(0, Math.min(1, (0.8 * vh - center) / (0.6 * vh)));
         }
       }
-      if (closestId) setActiveId(closestId);
+      if (closestId) {
+        setActiveId(closestId);
+        setAnimProgress(closestProgress);
+      }
     }
 
     update();
@@ -122,6 +131,7 @@ export default function HowItWorks() {
   }, []);
 
   const level = REVEAL_AT[activeId] ?? 0;
+  const activeIndex = STEPS.findIndex((s) => s.id === activeId);
 
   return (
     <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] p-4 shadow-[var(--panel-shadow)] sm:p-6">
@@ -134,9 +144,10 @@ export default function HowItWorks() {
 
         <div className="relative space-y-[18vh] py-1 pb-[12vh] pl-6">
           <div className="absolute bottom-0 left-[3px] top-2 w-px bg-[var(--rule)]" />
-          {STEPS.map((s) => {
+          {STEPS.map((s, sIndex) => {
             const active = s.id === activeId;
             const passed = REVEAL_AT[s.id] <= level;
+            const stepProgress = sIndex < activeIndex ? 1 : sIndex === activeIndex ? animProgress : 0;
             return (
               <div
                 key={s.id}
@@ -162,7 +173,7 @@ export default function HowItWorks() {
                 <h3 className="mb-3 text-2xl font-bold sm:text-[28px]">{s.title}</h3>
                 <p className="max-w-[52ch] text-[15px] leading-relaxed text-[var(--dim)]">{s.body}</p>
                 {s.stage !== undefined && (
-                  <BatterAnimation stage={s.stage} revealed={passed} label={`${s.title}: ${s.kicker}`} />
+                  <BatterAnimation stage={s.stage} progress={stepProgress} label={`${s.title}: ${s.kicker}`} />
                 )}
               </div>
             );
