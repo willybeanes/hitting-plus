@@ -40,8 +40,6 @@ function Batter({ pose }: { pose: Pose }) {
       <path d="M99,38 Q99,26 108,25 Q117,26 117,38 Z" fill="var(--dim)" />
       {/* Helmet bill — extends right toward pitcher */}
       <line x1={117} y1={35} x2={128} y2={39} stroke="var(--dim)" strokeWidth={3} strokeLinecap="round" />
-      {/* Earflap — pitcher-facing side (right) */}
-      <path d="M117,38 Q124,47 118,54" fill="none" stroke="var(--dim)" strokeWidth={2} strokeLinecap="round" />
     </g>
   );
 }
