@@ -208,9 +208,11 @@ export default function PlayerCard({
           <div className="bg-[var(--panel)] px-4 py-3.5">
             <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">Hitting+</div>
             <div className="mt-1 text-xl font-bold tabular-nums" style={{ color: ramp(hp) }}>
-              {hp == null ? "--" : hp.toFixed(0)}
+              {fmtNum(d["Hitting+"], 0)}
             </div>
-            <div className="mt-0.5 text-[11px] text-[var(--dimmer)]">percentile</div>
+            <div className="mt-0.5 text-[11px] text-[var(--dimmer)]">
+              {hp == null ? "" : `${ordinal(hp)} pctile`}
+            </div>
           </div>
           <div className="bg-[var(--panel)] px-4 py-3.5">
             <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--dim)]">wRC+</div>
