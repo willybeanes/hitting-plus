@@ -109,11 +109,6 @@ function StageTiming({ p }: { p: number }) {
       <line x1={LATE_X + 4} y1={LATE_Y + 14} x2={IDEAL_X - 5} y2={CONTACT_Y + 14}
         stroke="var(--dimmer)" strokeWidth={1} opacity={alpha * 0.5} />
 
-      {/* Bat barrel arc (faint — shows the swing path) */}
-      <path d="M72,28 Q140,12 191,78"
-        fill="none" stroke="var(--dimmer)" strokeWidth={1}
-        strokeDasharray="2 5" opacity={alpha * 0.4} />
-
       <Batter pose={pose} />
     </>
   );
