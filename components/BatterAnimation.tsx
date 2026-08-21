@@ -75,25 +75,45 @@ function StageDecision({ p }: { p: number }) {
   );
 }
 
-/** Timing+: bat sweeps from loaded position all the way to contact zone */
+/** Timing+: pitch trajectory from right; ideal vs late contact depth markers */
 function StageTiming({ p }: { p: number }) {
   const pose = lerpPose(LOADED, CONTACT, p);
-  const arcAlpha = clamp01(p * 2.5);
-  const ballAlpha = clamp01((p - 0.15) * 4);
+  const alpha = clamp01(p * 2);
+
+  // Contact depth markers along the pitch path
+  const IDEAL_X = 191, CONTACT_Y = 78;
+  const LATE_X  = 155, LATE_Y    = 78;
 
   return (
     <>
-      {/* Barrel path arc from loaded (upper-left) to contact (right) */}
-      <path d="M72,28 Q140,12 186,78"
-        fill="none" stroke="var(--dimmer)" strokeWidth={1.5}
-        strokeDasharray="3 5" opacity={arcAlpha} />
-      {/* Contact zone target ring */}
-      <circle cx={186} cy={78} r={6} fill="none"
-        stroke="var(--accent)" strokeWidth={1.5} opacity={arcAlpha} />
-      {/* Ball waiting at the plate */}
-      <g opacity={ballAlpha}>
-        <Ball cx={157} cy={80} />
-      </g>
+      {/* Pitch trajectory — dotted line extending right toward pitcher */}
+      <line x1={140} y1={CONTACT_Y} x2={275} y2={68}
+        stroke="var(--dimmer)" strokeWidth={1.2} strokeDasharray="4 4"
+        opacity={alpha} />
+
+      {/* "Late" contact marker */}
+      <circle cx={LATE_X} cy={LATE_Y} r={4.5} fill="none"
+        stroke="var(--dimmer)" strokeWidth={1.5} opacity={alpha} />
+      <text x={LATE_X} y={LATE_Y - 9} textAnchor="middle"
+        fontSize={8} fontWeight="600" fill="var(--dimmer)" opacity={alpha}
+        style={{ fontFamily: "inherit" }}>Late</text>
+
+      {/* "Ideal" contact marker */}
+      <circle cx={IDEAL_X} cy={CONTACT_Y} r={5.5} fill="none"
+        stroke="var(--accent)" strokeWidth={1.5} opacity={alpha} />
+      <text x={IDEAL_X} y={CONTACT_Y - 10} textAnchor="middle"
+        fontSize={8} fontWeight="600" fill="var(--accent)" opacity={alpha}
+        style={{ fontFamily: "inherit" }}>Ideal</text>
+
+      {/* Span bracket between the two markers */}
+      <line x1={LATE_X + 4} y1={LATE_Y + 14} x2={IDEAL_X - 5} y2={CONTACT_Y + 14}
+        stroke="var(--dimmer)" strokeWidth={1} opacity={alpha * 0.5} />
+
+      {/* Bat barrel arc (faint — shows the swing path) */}
+      <path d="M72,28 Q140,12 191,78"
+        fill="none" stroke="var(--dimmer)" strokeWidth={1}
+        strokeDasharray="2 5" opacity={alpha * 0.4} />
+
       <Batter pose={pose} />
     </>
   );
