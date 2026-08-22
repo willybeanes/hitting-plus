@@ -241,14 +241,6 @@ export default function PlayerCard({
             <div className="mt-0.5 text-[11px] text-[var(--dimmer)]">per batted ball</div>
           </div>
         </div>
-        {read && (
-          <div
-            className="mt-3.5 rounded-r-[10px] bg-[var(--track)] px-4 py-3.5 text-sm"
-            style={{ borderLeft: `2px solid ${warn ? "var(--amber)" : "var(--accent)"}` }}
-          >
-            {read}
-          </div>
-        )}
       </div>
     </div>
   );
