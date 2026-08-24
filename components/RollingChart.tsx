@@ -9,12 +9,14 @@ interface GameLog {
   "Contact+": (number | null)[];
   "Power+": (number | null)[];
   "Hitting+": (number | null)[];
+  "wOBA+": (number | null)[];
 }
 
-type MetricKey = "Hitting+" | "Decision+" | "Timing+" | "Contact+" | "Power+";
+type MetricKey = "Hitting+" | "Decision+" | "Timing+" | "Contact+" | "Power+" | "wOBA+";
 
 const METRICS: { key: MetricKey; color: string }[] = [
   { key: "Hitting+",  color: "#c0392c" },
+  { key: "wOBA+",     color: "#1a1a1a" },
   { key: "Decision+", color: "#7fa0cb" },
   { key: "Timing+",   color: "#c9922f" },
   { key: "Contact+",  color: "#4a9e6b" },
@@ -53,7 +55,7 @@ export default function RollingChart({
   const [log, setLog] = useState<GameLog | null>(null);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState<Set<MetricKey>>(
-    new Set(["Hitting+", "Power+", "Contact+"])
+    new Set(["Hitting+", "wOBA+"])
   );
   const svgRef = useRef<SVGSVGElement>(null);
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
@@ -261,6 +263,7 @@ export default function RollingChart({
 
         {/* 30-day label */}
         <div className="absolute bottom-1 right-2 text-[9px] text-[var(--dimmer)]">30-day rolling</div>
+        <div className="absolute bottom-1 left-2 text-[9px] text-[var(--dimmer)]">wOBA+ = wOBA / lg avg × 100, no park adj</div>
       </div>
     </div>
   );
