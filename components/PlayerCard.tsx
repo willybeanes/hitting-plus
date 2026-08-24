@@ -7,6 +7,7 @@ import WhiffDiagram from "./WhiffDiagram";
 import PowerDiagram from "./PowerDiagram";
 import Headshot from "./Headshot";
 import YearOverYear from "./YearOverYear";
+import RollingChart from "./RollingChart";
 
 type PctFn = (x: number | null | undefined) => number | null;
 type PctRecord = Record<StatKey, PctFn>;
@@ -199,6 +200,8 @@ export default function PlayerCard({
       </div>
 
       <YearOverYear history={history} pctBySeason={pctBySeason} currentSeason={d.game_year} onSelectSeason={onSelectSeason} />
+
+      <RollingChart playerName={d.player_name} season={d.game_year} />
 
       <div className="mt-6">
         <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--dim)]">
