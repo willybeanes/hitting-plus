@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 interface GameLog {
   dates: string[];
@@ -46,32 +46,21 @@ function buildPath(xs: number[], ys: (number | null)[]): string {
 }
 
 export default function RollingChart({
-  playerName,
-  season,
+  gamelog,
+  loading = false,
 }: {
-  playerName: string;
-  season: number;
+  gamelog: Record<string, unknown> | null;
+  loading?: boolean;
 }) {
-  const [log, setLog] = useState<GameLog | null>(null);
-  const [loading, setLoading] = useState(true);
+  const log = useMemo<GameLog | null>(() => {
+    if (!gamelog || !("dates" in gamelog)) return null;
+    return gamelog as unknown as GameLog;
+  }, [gamelog]);
   const [active, setActive] = useState<Set<MetricKey>>(
     new Set(["Hitting+", "wOBA+"])
   );
   const svgRef = useRef<SVGSVGElement>(null);
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
-
-  useEffect(() => {
-    setLoading(true);
-    setLog(null);
-    fetch(`/data/gamelogs_${season}.json`)
-      .then((r) => r.json())
-      .then((d) => {
-        const p = d.players?.[playerName];
-        setLog(p ?? null);
-      })
-      .catch(() => setLog(null))
-      .finally(() => setLoading(false));
-  }, [playerName, season]);
 
   function toggleMetric(k: MetricKey) {
     setActive((prev) => {

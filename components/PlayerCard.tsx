@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import { COMPONENT_KEYS, CONF_FIELD, DepthKey, Player, StatKey } from "@/lib/types";
 import { confidenceOpacity, confidenceTier, fmtNum, fmtPercentile, fmtSigned, ordinal } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
@@ -8,6 +11,7 @@ import PowerDiagram from "./PowerDiagram";
 import Headshot from "./Headshot";
 import YearOverYear from "./YearOverYear";
 import RollingChart from "./RollingChart";
+import SplitsTable from "./SplitsTable";
 
 type PctFn = (x: number | null | undefined) => number | null;
 type PctRecord = Record<StatKey, PctFn>;
@@ -46,6 +50,27 @@ export default function PlayerCard({
   pctBySeason,
   onSelectSeason,
 }: Props) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [gamelog, setGamelog] = useState<Record<string, unknown> | null | "loading">("loading");
+
+  // Fetch gamelog for this player+season
+  useEffect(() => {
+    setGamelog("loading");
+    fetch(`/data/gamelogs_${d.game_year}.json`)
+      .then((r) => r.json())
+      .then((data) => setGamelog(data?.players?.[d.player_name] ?? null))
+      .catch(() => setGamelog(null));
+  }, [d.player_name, d.game_year]);
+
+  // Scroll card into view when season changes (e.g. from YearOverYear click)
+  const prevSeason = useRef(d.game_year);
+  useEffect(() => {
+    if (prevSeason.current !== d.game_year) {
+      prevSeason.current = d.game_year;
+      cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [d.game_year]);
+
   const hp = pct["Hitting+"](d["Hitting+"]);
   const xp = pct["xwoba"](d.xwoba);
   const wp = pct["wrc_plus"](d.wrc_plus);
@@ -76,8 +101,13 @@ export default function PlayerCard({
     }
   }
 
+  const loadedGamelog = gamelog === "loading" ? null : gamelog;
+  const splits = loadedGamelog && typeof loadedGamelog === "object" && "splits" in loadedGamelog
+    ? (loadedGamelog as { splits: Parameters<typeof SplitsTable>[0]["splits"] }).splits
+    : undefined;
+
   return (
-    <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] px-5 py-6 shadow-[var(--panel-shadow)] sm:px-7 sm:py-6">
+    <div ref={cardRef} className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] px-5 py-6 shadow-[var(--panel-shadow)] sm:px-7 sm:py-6">
       <div className="flex flex-wrap items-start justify-between gap-5 border-b border-[var(--rule)] pb-5">
         <div className="flex items-center gap-4">
           <Headshot name={d.player_name} size={72} className="border border-[var(--panel-border)]" />
@@ -201,7 +231,9 @@ export default function PlayerCard({
 
       <YearOverYear history={history} pctBySeason={pctBySeason} currentSeason={d.game_year} onSelectSeason={onSelectSeason} />
 
-      <RollingChart playerName={d.player_name} season={d.game_year} />
+      <SplitsTable splits={splits} />
+
+      <RollingChart gamelog={gamelog === "loading" ? null : gamelog} loading={gamelog === "loading"} />
 
       <div className="mt-6">
         <h2 className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--dim)]">
