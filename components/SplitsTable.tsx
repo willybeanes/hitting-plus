@@ -30,11 +30,11 @@ function fmt(v: number | null) {
 }
 
 const COLS: { key: keyof SplitRow; label: string }[] = [
+  { key: "Hitting+",  label: "Hit+" },
   { key: "Decision+", label: "Dec+" },
   { key: "Timing+",   label: "Tim+" },
   { key: "Contact+",  label: "Con+" },
   { key: "Power+",    label: "Pow+" },
-  { key: "Hitting+",  label: "Hit+" },
 ];
 
 function SplitSection({
