@@ -233,7 +233,7 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
           )}
         </div>
 
-        {(tab === "leaderboard" || tab === "teams") && (
+        {tab === "leaderboard" && (
           <>
             <div className="mt-3 flex flex-wrap items-center gap-2.5 border-t border-[var(--rule)] pt-3">
               <span className="text-xs font-medium text-[var(--dim)]">Min PA</span>
@@ -254,7 +254,7 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
                   </button>
                 ))}
               </div>
-              {tab === "leaderboard" && <span className="text-xs text-[var(--dimmer)]">{visiblePlayers.length} shown</span>}
+              <span className="text-xs text-[var(--dimmer)]">{visiblePlayers.length} shown</span>
             </div>
             <p className="mt-2 text-[11px] leading-relaxed text-[var(--dimmer)]">{PA_FILTER_NOTE}</p>
           </>
@@ -312,7 +312,6 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
           players={seasonPlayers}
           season={season}
           pct={pct}
-          minPA={minPA}
           onSelectPlayer={selectPlayer}
         />
       )}

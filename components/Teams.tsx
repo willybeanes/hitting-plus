@@ -60,13 +60,11 @@ export default function Teams({
   players,
   season,
   pct,
-  minPA,
   onSelectPlayer,
 }: {
   players: Player[];
   season: number;
   pct: Record<StatKey, PctFn>;
-  minPA: number;
   onSelectPlayer: (name: string) => void;
 }) {
   const info = usePlayerInfo();
@@ -91,10 +89,8 @@ export default function Teams({
 
     const rows: TeamRow[] = [];
     for (const [team, ps] of byTeam) {
-      // Only include players above minPA for averages, matching leaderboard filter
-      const qual = ps.filter((p) => p.pa >= minPA);
-      if (qual.length === 0) continue;
-
+      if (ps.length === 0) continue;
+      const qual = ps;
       const totalPA = qual.reduce((s, p) => s + p.pa, 0);
 
       function wavg(key: keyof Player) {
@@ -119,7 +115,7 @@ export default function Teams({
     }
 
     return rows;
-  }, [info, players, season, minPA]);
+  }, [info, players, season]);
 
   const sorted = useMemo(() => {
     return [...teamRows].sort((a, b) => {
@@ -147,10 +143,10 @@ export default function Teams({
         if (!pi) return false;
         const seasons = pi.teamsBySeason?.[String(season)];
         const team = seasons?.length ? seasons[seasons.length - 1] : pi.team;
-        return team === expandedTeam && p.pa >= minPA;
+        return team === expandedTeam;
       })
       .sort((a, b) => (b["Hitting+"] ?? -Infinity) - (a["Hitting+"] ?? -Infinity));
-  }, [expandedTeam, info, players, season, minPA]);
+  }, [expandedTeam, info, players, season]);
 
   if (!info) {
     return (
@@ -233,7 +229,7 @@ export default function Teams({
                     <tr key={row.team + "-expanded"} className="border-t border-[var(--rule)] bg-[var(--track)]">
                       <td colSpan={3 + GRADE_COLS.length} className="px-5 pb-3 pt-2">
                         <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--dimmer)] mb-2">
-                          {row.team} — {season} ({row.players} qualifiers, {minPA}+ PA)
+                          {row.team} — {season} ({row.players} batters)
                         </div>
                         <div className="flex flex-wrap gap-x-4 gap-y-1">
                           {expandedPlayers.map((p) => {
@@ -265,7 +261,7 @@ export default function Teams({
         </table>
       </div>
       <p className="px-5 pb-4 pt-3 text-[11px] text-[var(--dimmer)]">
-        Grades are PA-weighted averages across qualifying batters ({minPA}+ PA). Team assigned by most recent roster entry for the season.
+        Grades are PA-weighted averages across all batters with data for the season. Team assigned by most recent roster entry.
       </p>
     </div>
   );
