@@ -10,9 +10,10 @@ import PlayerCard from "./PlayerCard";
 import Leaderboard from "./Leaderboard";
 import Compare from "./Compare";
 import HowItWorks from "./HowItWorks";
+import Teams from "./Teams";
 
-type Tab = "card" | "leaderboard" | "compare" | "how";
-const TAB_KEYS: Tab[] = ["card", "leaderboard", "compare", "how"];
+type Tab = "card" | "leaderboard" | "compare" | "teams" | "how";
+const TAB_KEYS: Tab[] = ["card", "leaderboard", "compare", "teams", "how"];
 
 const DEPTH_KEYS: DepthKey[] = ["depth_FB", "depth_BR", "depth_OS"];
 const PCT_KEYS = [...COMPONENT_KEYS, "Hitting+", "xwoba", "wrc_plus"] as const;
@@ -23,6 +24,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "card", label: "Player" },
   { key: "leaderboard", label: "Leaderboard" },
   { key: "compare", label: "Compare" },
+  { key: "teams", label: "Teams" },
   { key: "how", label: "How it works" },
 ];
 
@@ -231,7 +233,7 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
           )}
         </div>
 
-        {tab === "leaderboard" && (
+        {(tab === "leaderboard" || tab === "teams") && (
           <>
             <div className="mt-3 flex flex-wrap items-center gap-2.5 border-t border-[var(--rule)] pt-3">
               <span className="text-xs font-medium text-[var(--dim)]">Min PA</span>
@@ -252,7 +254,7 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
                   </button>
                 ))}
               </div>
-              <span className="text-xs text-[var(--dimmer)]">{visiblePlayers.length} shown</span>
+              {tab === "leaderboard" && <span className="text-xs text-[var(--dimmer)]">{visiblePlayers.length} shown</span>}
             </div>
             <p className="mt-2 text-[11px] leading-relaxed text-[var(--dimmer)]">{PA_FILTER_NOTE}</p>
           </>
@@ -302,6 +304,16 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
           pct={pct}
           selected={compareNames}
           onChangeSelected={setCompareNames}
+        />
+      )}
+
+      {tab === "teams" && (
+        <Teams
+          players={seasonPlayers}
+          season={season}
+          pct={pct}
+          minPA={minPA}
+          onSelectPlayer={selectPlayer}
         />
       )}
 
