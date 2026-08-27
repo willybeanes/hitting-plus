@@ -213,7 +213,7 @@ export default function Explorer({ data }: { data: SwingPlusData }) {
             ))}
           </nav>
 
-          {tab === "card" && <SearchBox players={visiblePlayers} onSelect={selectPlayer} />}
+          {tab === "card" && <SearchBox players={seasonPlayers} onSelect={selectPlayer} />}
 
           {tab !== "how" && (
             <label className="ml-auto flex items-center gap-2 text-xs font-medium text-[var(--dim)]">
