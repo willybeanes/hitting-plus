@@ -22,7 +22,18 @@ export default function SearchBox({ players, placeholder, onSelect, excludeNames
     if (!t) return [];
     const excluded = new Set(excludeNames ?? []);
     return players
-      .filter((p) => normalize(p.player_name).includes(t) && !excluded.has(p.player_name))
+      .filter((p) => {
+        if (excluded.has(p.player_name)) return false;
+        const stored = normalize(p.player_name); // "last suffix, first"
+        if (stored.includes(t)) return true;
+        // Also match "first last" order: "Last Jr., First" → "first last jr."
+        const comma = stored.indexOf(",");
+        if (comma > 0) {
+          const firstLast = stored.slice(comma + 1).trim() + " " + stored.slice(0, comma).trim();
+          if (firstLast.includes(t)) return true;
+        }
+        return false;
+      })
       .sort((a, b) => (b["Hitting+"] ?? -Infinity) - (a["Hitting+"] ?? -Infinity))
       .slice(0, 9);
   }, [term, players, excludeNames]);
