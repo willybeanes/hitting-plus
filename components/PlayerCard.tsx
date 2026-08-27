@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { COMPONENT_KEYS, CONF_FIELD, DepthKey, Player, StatKey } from "@/lib/types";
-import { confidenceOpacity, confidenceTier, fmtNum, fmtPercentile, fmtSigned, ordinal } from "@/lib/metrics";
+import { confidenceOpacity, confidenceTier, fmtNum, fmtPercentile, fmtSigned, ordinal, formatName } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
 import { COMPONENT_ASK, CONFIDENCE_NOTE } from "@/lib/copy";
 import ContactDiagram from "./ContactDiagram";
@@ -112,7 +112,7 @@ export default function PlayerCard({
         <div className="flex items-center gap-4">
           <Headshot name={d.player_name} size={72} className="border border-[var(--panel-border)]" />
           <div>
-            <div className="text-3xl font-bold leading-tight sm:text-[34px]">{d.player_name}</div>
+            <div className="text-3xl font-bold leading-tight sm:text-[34px]">{formatName(d.player_name)}</div>
             <div className="mt-1.5 text-xs text-[var(--dim)]">
               {[
                 `${d.game_year}`,
@@ -201,7 +201,7 @@ export default function PlayerCard({
           <ContactDiagram player={d} leagueDepth={leagueDepth} eliteGap={eliteGap} />
         </div>
         <p className="mt-2 text-[11px] text-[var(--dimmer)]">
-          {`Fastball is ${d.player_name.split(",")[0]}'s own baseline. Each dot shows how many inches later he meets that pitch type than he meets a fastball, which is exactly what Timing+ grades: the gap, not how early or late he is compared to other hitters. The open circle marks a typical hitter's gap and the line marks the least-fooled hitters' gap (90th percentile), so a hitter can look ordinary on any one pitch type and still have a large or small gap.`}
+          {`Fastball is ${formatName(d.player_name).split(" ")[0]}'s own baseline. Each dot shows how many inches later he meets that pitch type than he meets a fastball, which is exactly what Timing+ grades: the gap, not how early or late he is compared to other hitters. The open circle marks a typical hitter's gap and the line marks the least-fooled hitters' gap (90th percentile), so a hitter can look ordinary on any one pitch type and still have a large or small gap.`}
         </p>
       </div>
 
@@ -213,7 +213,7 @@ export default function PlayerCard({
           <WhiffDiagram player={d} leagueGap={leagueWhiffGap} eliteGap={eliteWhiffGap} />
         </div>
         <p className="mt-2 text-[11px] text-[var(--dimmer)]">
-          {`How much more, or less, ${d.player_name.split(",")[0]} whiffed than expected given the location, count and pitch type he actually swung at, which is exactly what Contact+ grades: the gap, not the raw whiff rate, so a hitter who saw tougher pitches isn't penalized for it. The open circle marks a typical hitter's gap and the line marks the least-fooled hitters' gap (10th percentile).`}
+          {`How much more, or less, ${formatName(d.player_name).split(" ")[0]} whiffed than expected given the location, count and pitch type he actually swung at, which is exactly what Contact+ grades: the gap, not the raw whiff rate, so a hitter who saw tougher pitches isn't penalized for it. The open circle marks a typical hitter's gap and the line marks the least-fooled hitters' gap (10th percentile).`}
         </p>
       </div>
 

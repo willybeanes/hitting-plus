@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Player, StatKey } from "@/lib/types";
-import { fmtNum } from "@/lib/metrics";
+import { fmtNum, formatName } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
 
 type PctFn = (x: number | null | undefined) => number | null;
@@ -246,7 +246,7 @@ export default function Teams({
                                 >
                                   {fmtNum(p["Hitting+"], 0)}
                                 </span>
-                                <span className="text-[var(--dim)]">{p.player_name}</span>
+                                <span className="text-[var(--dim)]">{formatName(p.player_name)}</span>
                               </button>
                             );
                           })}

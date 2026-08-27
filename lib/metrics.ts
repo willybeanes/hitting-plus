@@ -1,5 +1,14 @@
 import { Player } from "./types";
 
+/** Convert stored "Last Jr., First" to display "First Last Jr." */
+export function formatName(stored: string): string {
+  const comma = stored.indexOf(",");
+  if (comma < 0) return stored;
+  const last  = stored.slice(0, comma).trim();
+  const first = stored.slice(comma + 1).trim();
+  return first ? `${first} ${last}` : stored;
+}
+
 /** Strip accents so "Ramirez" matches "Ramírez". */
 export function normalize(s: string): string {
   return s

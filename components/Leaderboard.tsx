@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Player, StatKey } from "@/lib/types";
-import { fmtNum, fmtSigned } from "@/lib/metrics";
+import { fmtNum, fmtSigned, formatName } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
 import { MlbInfo, resolveMlbInfo } from "@/lib/headshot";
 import Headshot from "./Headshot";
@@ -212,7 +212,7 @@ export default function Leaderboard({
                     <span className="flex items-center gap-2">
                       <Headshot name={r.player_name} size={22} />
                       <span>
-                        <span className="block">{r.player_name}</span>
+                        <span className="block">{formatName(r.player_name)}</span>
                         {rowInfo && (teamLabel || rowInfo.position) && (
                           <span className="block text-[11px] font-normal text-[var(--dimmer)]">
                             {[teamLabel, rowInfo.position].filter(Boolean).join(" · ")}

@@ -2,7 +2,7 @@
 
 import { useId, useMemo, useState } from "react";
 import { Player } from "@/lib/types";
-import { normalize, fmtNum } from "@/lib/metrics";
+import { normalize, fmtNum, formatName } from "@/lib/metrics";
 
 interface Props {
   players: Player[];
@@ -104,7 +104,7 @@ export default function SearchBox({ players, placeholder, onSelect, excludeNames
                 i === active ? "bg-[var(--accent-dim)]" : ""
               }`}
             >
-              <span>{r.player_name}</span>
+              <span>{formatName(r.player_name)}</span>
               <span className="text-xs text-[var(--dim)]">{fmtNum(r["Hitting+"], 0)}</span>
             </li>
           ))}

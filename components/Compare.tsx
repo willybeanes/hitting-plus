@@ -1,7 +1,7 @@
 "use client";
 
 import { COMPONENT_KEYS, ComponentKey, Player, StatKey } from "@/lib/types";
-import { fmtNum, fmtSigned } from "@/lib/metrics";
+import { fmtNum, fmtSigned, formatName } from "@/lib/metrics";
 import { ramp } from "@/lib/ramp";
 import { COMPONENT_ASK } from "@/lib/copy";
 import SearchBox from "./SearchBox";
@@ -97,7 +97,7 @@ export default function Compare({
                 {chosen.map((p) => (
                   <th key={p.player_name} className="px-3 pb-3 text-right align-bottom">
                     <Headshot name={p.player_name} size={48} className="ml-auto mb-1.5 border border-[var(--panel-border)]" />
-                    <div className="text-lg font-bold leading-tight">{p.player_name}</div>
+                    <div className="text-lg font-bold leading-tight">{formatName(p.player_name)}</div>
                     <button
                       type="button"
                       onClick={() => remove(p.player_name)}
