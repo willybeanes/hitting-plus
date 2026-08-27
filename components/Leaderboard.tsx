@@ -186,8 +186,8 @@ export default function Leaderboard({
                   scope="col"
                   onClick={() => onSort(c.key as string)}
                   aria-sort={sort.k === c.key ? (sort.dir === 1 ? "ascending" : "descending") : "none"}
-                  className={`sticky top-0 z-10 cursor-pointer select-none whitespace-nowrap border-b border-[var(--rule)] bg-[var(--panel)] px-2.5 py-2.5 text-[10px] font-bold uppercase tracking-[0.1em] shadow-[0_1px_0_var(--rule)] hover:text-[var(--text)] ${
-                    c.key === "player_name" ? "text-left" : "text-right"
+                  className={`sticky top-0 cursor-pointer select-none whitespace-nowrap border-b border-[var(--rule)] bg-[var(--panel)] px-2.5 py-2.5 text-[10px] font-bold uppercase tracking-[0.1em] shadow-[0_1px_0_var(--rule)] hover:text-[var(--text)] ${
+                    c.key === "player_name" ? "left-0 z-20 text-left" : "z-10 text-right"
                   } ${sort.k === c.key ? "text-[var(--accent)]" : "text-[var(--dim)]"}`}
                 >
                   {c.label}
@@ -206,9 +206,9 @@ export default function Leaderboard({
                 <tr
                   key={r.player_name}
                   onClick={() => onSelect(r.player_name)}
-                  className="cursor-pointer border-t border-[var(--rule)] hover:bg-[var(--track)]"
+                  className="group cursor-pointer border-t border-[var(--rule)] hover:bg-[var(--track)]"
                 >
-                  <td className="px-2.5 py-2 text-left font-medium hover:text-[var(--accent)]">
+                  <td className="sticky left-0 z-[1] bg-[var(--panel)] px-2.5 py-2 text-left font-medium group-hover:bg-[var(--track)] group-hover:text-[var(--accent)]">
                     <span className="flex items-center gap-2">
                       <Headshot name={r.player_name} size={22} />
                       <span>

@@ -39,7 +39,7 @@ export default function YearOverYear({
         <table className="w-full min-w-[480px] border-collapse text-sm">
           <thead>
             <tr>
-              <th className="px-2.5 py-2 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--dim)]">
+              <th className="sticky left-0 z-10 bg-[var(--panel)] px-2.5 py-2 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--dim)]">
                 Season
               </th>
               <th className="px-2.5 py-2 text-right text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--dim)]">
@@ -63,10 +63,13 @@ export default function YearOverYear({
                 <tr
                   key={r.game_year}
                   onClick={() => onSelectSeason(r.game_year)}
-                  className="cursor-pointer border-t border-[var(--rule)] hover:bg-[var(--track)]"
+                  className="group cursor-pointer border-t border-[var(--rule)] hover:bg-[var(--track)]"
                   style={{ background: isCurrent ? "var(--track)" : undefined }}
                 >
-                  <td className="px-2.5 py-2 text-left font-semibold">
+                  <td
+                    className="sticky left-0 z-[1] px-2.5 py-2 text-left font-semibold group-hover:bg-[var(--track)]"
+                    style={{ background: isCurrent ? "var(--track)" : "var(--panel)" }}
+                  >
                     {r.game_year}
                     {isCurrent && <span className="ml-1.5 text-[10px] font-normal text-[var(--dimmer)]">(shown above)</span>}
                   </td>
