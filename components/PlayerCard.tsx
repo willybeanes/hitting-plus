@@ -121,6 +121,14 @@ export default function PlayerCard({
                 `${d.pa} PA`,
               ].join(" · ")}
             </div>
+            <a
+              href={`https://player-compare-rho.vercel.app/?tab=hitter&a=${encodeURIComponent(formatName(d.player_name))}&yearA=${d.game_year}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-1 rounded-md border border-[var(--rule)] bg-[var(--panel)] px-2.5 py-1 text-[11px] font-medium text-[var(--dim)] transition-colors hover:border-[var(--dimmer)] hover:text-[var(--text)]"
+            >
+              Compare in Percentile Compare ↗
+            </a>
           </div>
         </div>
         <div
