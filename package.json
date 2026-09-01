@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "resolve-players": "bun run scripts/resolve-players.ts",
-    "fetch-wrc-plus": "bun run scripts/fetch-wrc-plus.ts"
+    "resolve-players": "bun run scripts/resolve-players.ts && bun run sync-hopper",
+    "fetch-wrc-plus": "bun run scripts/fetch-wrc-plus.ts && bun run sync-hopper",
+    "sync-hopper": "cp public/data/*.json ../VSC/baseball-hopper/public/data/ && cd ../VSC/baseball-hopper && git add public/data/ && git diff --staged --quiet || (git commit -m 'data: sync hitting-plus snapshots' && git push)"
   },
   "dependencies": {
     "next": "16.2.12",
