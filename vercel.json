@@ -3,7 +3,7 @@
     {
       "source": "/(.*)",
       "destination": "https://baseball-hopper.vercel.app/hitting-plus",
-      "permanent": true
+      "permanent": false
     }
   ]
 }
