@@ -1,9 +1,8 @@
 {
-  "redirects": [
+  "rewrites": [
     {
-      "source": "/:path((?!data(?:/|$)).*)",
-      "destination": "https://baseball-hopper.vercel.app/hitting-plus",
-      "permanent": false
+      "source": "/(.*)",
+      "destination": "https://baseball-hopper.vercel.app/hitting-plus"
     }
   ]
 }
