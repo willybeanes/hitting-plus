@@ -1,7 +1,12 @@
 {
   "redirects": [
     {
-      "source": "/(.*)",
+      "source": "/data/(.*)",
+      "destination": "/data/$1",
+      "permanent": false
+    },
+    {
+      "source": "/((?!data/).*)",
       "destination": "https://baseball-hopper.vercel.app/hitting-plus",
       "permanent": false
     }
