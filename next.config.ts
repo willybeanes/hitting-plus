@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: "/:path*",
+        source: "/((?!data(?:\/|$)).*)",
         destination: "https://baseball-hopper.vercel.app/hitting-plus",
         permanent: false,
       },
