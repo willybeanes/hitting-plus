@@ -1,7 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        destination: "https://baseball-hopper.vercel.app/hitting-plus",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
