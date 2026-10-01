@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/((?!data(?:\/|$)).*)",
-        destination: "https://baseball-hopper.vercel.app/hitting-plus",
+        destination: "https://baseballhopper.com/hitting-plus",
         permanent: false,
       },
     ];
